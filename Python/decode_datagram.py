@@ -346,17 +346,7 @@ def decode_datagram(datagram=""):
 
 
 
-########################################
-final_parsed_datagram = decode_ethernet("fe aa 16 98 17 ba 53 10 91 5e ac 82 08 00")
-print(final_parsed_datagram)
-
-datagram_ip = decode_ip("45 00 7b 20 00 35 26 ac 40 11 aa b2 08 4e 4d 4b 45 e7 34 11")
-print(datagram_ip)
-
-datagram_protocol = decode_protocol("7b 20 00 43 09 18 00 6e aa b2 76 54 00 1b 00 00", int(datagram_ip.protocol))
-print(datagram_protocol)
-
-print("Final Test :")
+### TESTS ###
 datagram_str = raw_input("Enter the datagram :")
 parsed_datagram = decode_datagram(datagram_str)
 print(parsed_datagram)
