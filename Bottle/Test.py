@@ -3,7 +3,7 @@
 
 # Premier test de bottle.
 
-from bottle import route, run, template, request
+from bottle import route, run, template, request, response, redirect
 
 # Decorator
 @route('/hello')
@@ -30,6 +30,8 @@ def login():
         </form>
     '''
 
+# Permet de récupérer les données d'un POST.
+# Adapter
 @route('/login', method='POST')
 def do_login():
     username = request.forms.get('username')
@@ -46,8 +48,8 @@ def check_login(username, password):
     else:
         return False
 
-# Test formulaire + méthode GET
 
+# Test formulaire + méthode GET
 @route("/form_get")
 def form_get():
     # Code HTML
@@ -61,9 +63,32 @@ def form_get():
 @route("/form_get", method="POST")
 def do_form_get():
     url = request.forms.get("url")
-    @route(url, method="GET")
+    @route(url)
     def lel():
         return "Nothing"
+
+# Test récolte de donnée dans l'URL
+@route("/test_data_url")
+def url_get_data():
+    # Aller à l'URL "localhost:8080/test_data_url?id=30" par exemple
+    id_test = request.query.id
+
+    return template("ID = {{id_url}}", id_url=id_test)
+
+
+# Test récolte donnée envoyer par un POST par cURL
+@route("test_post/:file_xml", method="POST")
+def post_get_data(file_xml):
+    data = file_xml
+    print data
+    ## Vérifier d'où provient le POST
+    ## Enregistrer la donnée.
+
+# Permet de rediriger vers une autre URL.
+@route("/redirect")
+def redirect_to_google():
+    redirect("http://google.com")
+
 
 
 run(host='0.0.0.0', port=8080, debug=True)
