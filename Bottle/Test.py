@@ -2,7 +2,7 @@
 # -*-coding:Utf-8 -*
 
 # Premier test de bottle.
-
+from function import save_data
 from bottle import route, run, template, request, response, redirect
 
 # Decorator
@@ -90,5 +90,15 @@ def redirect_to_google():
     redirect("http://google.com")
 
 
+# Permet de récupérer les fichiers XML via protocole HTTP "POST" et affiche le contenu du fichier.
+@route("/listener", method="POST")
+def recolt_xml():
+    if request.headers['Content-Type'] == "text/xml":
+        file_xml = request.body.read()
+        save_data(file_xml)
+        return "This is an xml file !\nXML FILE : " + file_xml
+    else :
+        return "Error, it's not a xml file\n"
 
-run(host='0.0.0.0', port=8080, debug=True)
+
+run(host='0.0.0.0', port=80, debug=True)
