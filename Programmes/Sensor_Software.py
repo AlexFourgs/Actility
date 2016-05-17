@@ -36,7 +36,7 @@ from bottle import route, run, request
 def recolt_xml():
     if request.headers['Content-Type'] == "text/xml":
         file_xml = request.body.read()
-        save_data(file_xml)
+        save_data_file(file_xml)
         print "This is an xml file !\nXML FILE : " + file_xml
     else :
         print "Error, it's not a xml file\n"
