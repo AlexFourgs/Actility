@@ -29,6 +29,18 @@ from bottle import route, run, request
 
             #return "Error, it's not a xml file\n"
 """
+def save_data_file(self, xml_file=""):
+    """ This function create a xml file with the DATA from the POST method and save it into the path DATA """
+
+    # We take the date for named the new xml file.
+    date = time.localtime()
+    file_name = "./DATA/" + str(date.tm_mday) + "_" + str(date.tm_mon) + "_" + str(date.tm_year) + "_" + str(date.tm_hour) + "_" + str(date.tm_min) + "_" + str(date.tm_sec)
+
+    with open(file_name, "w") as new_xml_file:
+        new_xml_file.write(xml_file)
+
+    new_xml_file.close()
+
 
 # Permet de récupérer les fichiers XML via protocole HTTP "POST" et affiche le contenu du fichier.
 # curl -X POST --header "Content-Type:text/xml;charset=UTF-8" --data @test_xml.xml http://192.168.1.20:8080/listener
