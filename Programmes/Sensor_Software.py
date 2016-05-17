@@ -47,7 +47,7 @@ def save_data_file(self, xml_file=""):
 @route("/listener", method="POST")
 def recolt_xml():
     ip = request.environ.get('REMOTE_ADDR')
-    print "Post receive from" + ip
+    print "Post receive from " + ip
     if request.headers['Content-Type'] == "text/xml":
         file_xml = request.body.read()
         save_data_file(file_xml)
