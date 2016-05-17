@@ -36,8 +36,8 @@ class database_engine:
     def create_table(self, table_name, list_data):
         request = "CREATE TABLE IF NOT EXISTS %s (" %(table_name)
         i = 0
-        while i < len(list_data) :
-            if i != len(list_data)-1 :
+        while i < len(list_data):
+            if i != len(list_data)-1:
                 request = request + list_data[i] + ", "
             else :
                 request = request + list_data[i] + ");"
@@ -104,7 +104,7 @@ class database_engine:
     def close_connection(self):
         self.db.close()
 
-if __name__=='__main__' :
+if __name__ == '__main__' :
     print("DATABASE MANAGER")
 
     database_engine = database_engine()

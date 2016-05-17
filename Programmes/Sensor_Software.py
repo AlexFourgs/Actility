@@ -46,6 +46,8 @@ def save_data_file(self, xml_file=""):
 # curl -X POST --header "Content-Type:text/xml;charset=UTF-8" --data @test_xml.xml http://192.168.1.20:8080/listener
 @route("/listener", method="POST")
 def recolt_xml():
+    ip = request.environ.get('REMOTE_ADDR')
+    print "Post receive from" + ip
     if request.headers['Content-Type'] == "text/xml":
         file_xml = request.body.read()
         save_data_file(file_xml)
