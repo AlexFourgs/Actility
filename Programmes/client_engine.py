@@ -145,7 +145,7 @@ class engine:
 
     def __init__(self):
         self.__sensors_db = sensors()
-        self.__database_engine = database_manager.database_engine()
+        self.__database_engine = database_manager.Database_Engine()
 
     def parse_xml(self, file):
         # TODO write this function.
@@ -178,7 +178,7 @@ class engine:
 
             return list_recorded_data
 
-    def adeunis_lorawan_demonstrator_decoder(self, data):
+    def adeunis_decoder(self, data):
         """Function that decode the hex data from an Adeunis LoRaWan Demonstrator sensor"""
 
         length_data = len(data)
@@ -202,11 +202,16 @@ class engine:
 
         elif length_data == 28 : # Temperature + GPS
             temp = int(data[2:4], 16)
-            latitude = data[4:12]
-            longitude = data[12:20]
+            latitude_degrees = data[4:6]
+            latitude_minutes = data[6:13]
+            longitude_degrees = data[13:15]
+            longitude_minutes = data[15:20]
             uplink_counter = int(data[20:22], 16)
             downlink_counter = int(data[22:24], 16)
             battery= float(int(data[24:28], 16))/1000
+
+            latitude = float(latitude_degrees + "." + str(int(latitude_minutes)/60))
+            longitude = float(longitude_degrees + "." + str(int(longitude_minutes)/60))
 
             new_data = raw_data("Temperature", temp)
             new_data_2 = raw_data("Latitude", latitude)
@@ -224,28 +229,45 @@ class engine:
     def new_device(self, name, device_id):
         """ This function create and add a new sensor to the database sensors object """
 
-        if self.__sensors_db.get_devices().has_key(device_id):
-            print "Device [%s] %s already in the database" %(device_id, name)
+        if (self.__sensors_db.get_devices().has_key(device_id)):
+            print "Device [%s] %s already in the object device list" %(device_id, name)
         else:
             new_sensor = sensor_device(name, device_id)
             self.__sensors_db.add_device(new_sensor)
 
-        self.__database_engine.insert("Device", ["Id", "Model"], [device_id, name])
+        if not self.__database_engine.data_exist("Device", device_id):
+            print "[%s]%s already in the database"%(device_id, name)
+        else:
+            self.__database_engine.insert("Device", ["Id", "Model"], [device_id, name])
+
 
     def decode_and_add_record(self, device_id, date, data):
+        date = date.strftime('%Y-%m-%d %H:%M:%S')
         name_device = self.__sensors_db.get_devices()[device_id].get_name()
 
-        if name_device == "Watteco":
-            list_recorded_data = self.watteco_decoder(data)
-            new_record = record_data(date, list_recorded_data)
-            self.__sensors_db.get_devices()[device_id].add_data(new_record)
-            self.__database_engine.insert("Watteco", ["DeviceId", "Date", "Temperature"], [device_id ,date.strftime('%Y-%m-%d %H:%M:%S'), list_recorded_data[0].get_value()])
+        name_decoder_function = name_device.lower() + "_decoder"
+        decode = getattr(self, name_decoder_function)
+        list_recorded_data = decode(data)
 
-        elif name_device == "Adeunis" :
-            list_recorded_data = self.adeunis_lorawan_demonstrator_decoder(data)
-            new_record = record_data(date, list_recorded_data)
-            self.__sensors_db.get_devices()[device_id].add_data(new_record)
-            self.__database_engine.insert("Adeunis", ["DeviceId", "Date", "Temperature", "Latitude", "Longitude"], [device_id, date.strftime('%Y-%m-%d %H:%M:%S'), list_recorded_data[0].get_value(), list_recorded_data[1].get_value(), list_recorded_data[2].get_value()])
+        new_record = record_data(date, list_recorded_data)
+        self.__sensors_db.get_devices()[device_id].add_data(new_record)
+
+        if not self.__database_engine.record_exist(name_device, date):
+            print "Record from %s the %s already in the database."%(name_device, date)
+        else :
+            self.__database_engine.insert(name_device, ["Date", "DeviceId", "Temperature"], [date.strftime('%Y-%m-%d %H:%M:%S'), device_id, list_recorded_data[0].get_value()])
+
+            if name_device == "Watteco":
+                #list_recorded_data = self.watteco_decoder(data)
+                #new_record = record_data(date, list_recorded_data)
+                #self.__sensors_db.get_devices()[device_id].add_data(new_record)
+                self.__database_engine.insert("Watteco", ["Date", "DeviceId", "Temperature"], [date.strftime('%Y-%m-%d %H:%M:%S'), device_id, list_recorded_data[0].get_value()])
+
+            elif name_device == "Adeunis" :
+                #list_recorded_data = self.adeunis_decoder(data)
+                #new_record = record_data(date, list_recorded_data)
+                #self.__sensors_db.get_devices()[device_id].add_data(new_record)
+                self.__database_engine.insert("Adeunis", ["Date", "DeviceId", "Temperature", "Latitude", "Longitude"], [date.strftime('%Y-%m-%d %H:%M:%S'), device_id, list_recorded_data[0].get_value(), list_recorded_data[1].get_value(), list_recorded_data[2].get_value()])
 
     def get_sensors_db(self):
         return self.__sensors_db
@@ -270,19 +292,15 @@ if __name__ == '__main__':
     engine = engine()
 
     ## Test d'ajout de device.
-    ## OK POV object
-    ## OK POV database
     engine.new_device("Adeunis", "0018B20000000167")
     engine.new_device("Adeunis", "0018B20000000167") # insert error check
     engine.new_device("Watteco", "70B3D5E75E000239")
     device_db_object = engine.get_sensors_db()
 
     ## Tests des fonctions de décodage de payload et d'ajout dans les objets.
-    ## OK POV object
-    ## OK POV database
     engine.decode_and_add_record("0018B20000000167", datetime(2016, 1, 1, 0, 0, 0), "8e3036840b05")
-    engine.decode_and_add_record("0018B20000000167", datetime(2016, 1, 1, 0, 0, 0), "9e31485592200021746034830b1c")
-    engine.decode_and_add_record("70B3D5E75E000239", datetime(2016, 1, 1, 0, 0, 0), "6000000000111140000000000000000070b3d5e75e0002390000000000000000000000ff00000000f0b5f0b400111b79110a0402000029091d")
+    engine.decode_and_add_record("0018B20000000167", datetime(2016, 1, 2, 0, 0, 1), "9e31485592200021746034830b1c")
+    engine.decode_and_add_record("70B3D5E75E000239", datetime(2016, 1, 3, 0, 0, 2), "6000000000111140000000000000000070b3d5e75e0002390000000000000000000000ff00000000f0b5f0b400111b79110a0402000029091d")
     # Latitude : 48559220
     # Long : 00217460
     engine.close_database_connection()

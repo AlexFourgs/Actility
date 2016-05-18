@@ -3,7 +3,7 @@
 
 import sqlite3, os
 
-class database_engine:
+class Database_Engine:
     # /home/alex/Documents/Cours/Stage Travaux/Actility/Programmes/DataBase/
     """
         This object is the database engine, his role is to :
@@ -47,13 +47,13 @@ class database_engine:
         self.db.commit()
 
     def insert(self, table_name, list_value_to_add, list_value_data):
-        exist = "SELECT * FROM %s WHERE %s=\'%s\'"%(table_name, list_value_to_add[0], list_value_data[0])
+        exist = "SELECT * FROM %s WHERE \'Date\'=\'%s\'"%(table_name, list_value_data[0])
         select = self.db.cursor()
         select.execute(exist)
         rows = select.fetchall()
 
-        if len(rows) == 0 :
-            request = "INSERT INTO %s(" %(table_name)
+        if len(rows) == 0:
+            request = "INSERT INTO %s (" %(table_name)
 
             i=0
             while i < len(list_value_to_add) :
@@ -78,14 +78,35 @@ class database_engine:
                 i+=1
 
             print request
-
             self.db.execute(request)
             self.db.commit()
 
         else:
             print "Error, the data is already in the database."
 
-    #def delete_all_table(self):
+
+    def data_exist(self, table, key):
+        request = "SELECT * FROM \'%s\' WHERE Id = \'%s\'"%(table, key)
+        select = self.db.cursor()
+        select.execute(request)
+        rows = select.fetchall()
+
+        if len(rows) == 0: # There is no columns with this primary key
+            return True
+        else:
+            return False
+
+
+    def record_exist(self, table, date):
+        request = "SELECT * FROM \'%s\' WHERE Date = \'%s\'"%(table, date)
+        select = self.db.cursor()
+        select.execute(request)
+        rows = select.fetchall()
+
+        if len(rows) == 0: # There is no columns with this primary key
+            return True
+        else:
+            return False
 
     """
     def delete_table(self):
