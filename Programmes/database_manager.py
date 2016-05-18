@@ -108,6 +108,15 @@ class Database_Engine:
         else:
             return False
 
+    def get_columns(self, table):
+        columns = []
+
+        for row in self.db.execute("pragma table_info('%s')"%(table)).fetchall():
+            columns.append(row[1])
+
+        columns.pop() # Remove the last element of the list which is the primary key column name
+        return columns
+
     """
     def delete_table(self):
         # TODO

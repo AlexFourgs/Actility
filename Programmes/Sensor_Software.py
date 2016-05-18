@@ -45,7 +45,7 @@ def save_data_file(self, xml_file=""):
 
 # Permet de récupérer les fichiers XML via protocole HTTP "POST" et affiche le contenu du fichier.
 # curl -X POST --header "Content-Type:text/xml;charset=UTF-8" --data @test_xml.xml http://192.168.1.20:8080/listener
-@route("/listener", method="POST")
+@route("/", method="POST")
 def recolt_xml():
     ip = request.environ.get('REMOTE_ADDR')
     print "Post receive from " + ip
@@ -56,8 +56,6 @@ def recolt_xml():
     else :
         print "Error, it's not a xml file\n"
 
-
-#run(server='cherrypy', host='0.0.0.0', port=8080, debug=True)
 
 if __name__ == '__main__':
     #run(server='cherrypy', host='0.0.0.0', port=8080, debug=True)

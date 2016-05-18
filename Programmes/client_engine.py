@@ -191,9 +191,10 @@ class engine:
             latitude = 0
             longitude = 0
 
-            new_data = raw_data("Temperature", temp)
+            new_data = raw_data("Longitude", longitude)
             new_data_2 = raw_data("Latitude", latitude)
-            new_data_3 = raw_data("Longitude", longitude)
+            new_data_3 = raw_data("Temperature", temp)
+
 
             list_recorded_data=[new_data, new_data_2, new_data_3]
 
@@ -203,19 +204,27 @@ class engine:
         elif length_data == 28 : # Temperature + GPS
             temp = int(data[2:4], 16)
             latitude_degrees = data[4:6]
-            latitude_minutes = data[6:13]
-            longitude_degrees = data[13:15]
-            longitude_minutes = data[15:20]
+            latitude_minutes = data[6:11]
+            hemisphere_latitude = data[11:12]
+            longitude_degrees = data[12:15]
+            longitude_minutes = data[15:19]
+            hemisphere_longitude = data[19:20]
             uplink_counter = int(data[20:22], 16)
             downlink_counter = int(data[22:24], 16)
             battery= float(int(data[24:28], 16))/1000
 
-            latitude = float(latitude_degrees + "." + str(int(latitude_minutes)/60))
-            longitude = float(longitude_degrees + "." + str(int(longitude_minutes)/60))
 
-            new_data = raw_data("Temperature", temp)
+            latitude = float(latitude_degrees + "." + str(int(latitude_minutes)/60))
+            if int(hemisphere_latitude) > 0:
+                latitude *= -1
+
+            longitude = float(longitude_degrees + "." + str(int(longitude_minutes)/60))
+            if int(hemisphere_longitude) > 0:
+                longitude *= -1
+
+            new_data = raw_data("Longitude", longitude)
             new_data_2 = raw_data("Latitude", latitude)
-            new_data_3 = raw_data("Longitude", longitude)
+            new_data_3 = raw_data("Temperature", temp)
 
             list_recorded_data=[new_data, new_data_2, new_data_3]
 
@@ -249,25 +258,37 @@ class engine:
         decode = getattr(self, name_decoder_function)
         list_recorded_data = decode(data)
 
+        raw_list = []
+        i = 0
+        while i < len(list_recorded_data):
+            raw_list.append(list_recorded_data[i].get_value())
+            i += 1
+
+
         new_record = record_data(date, list_recorded_data)
         self.__sensors_db.get_devices()[device_id].add_data(new_record)
 
-        if not self.__database_engine.record_exist(name_device, date):
+        self.__database_engine.get_columns("Watteco")
+
+        if not self.__database_engine.record_exist(name_device, date): # Test if the record isn't exist by comparing the dates.
             print "Record from %s the %s already in the database."%(name_device, date)
         else :
-            self.__database_engine.insert(name_device, ["Date", "DeviceId", "Temperature"], [date.strftime('%Y-%m-%d %H:%M:%S'), device_id, list_recorded_data[0].get_value()])
+            columns = self.__database_engine.get_columns(name_device)
+            data_to_add = raw_list + [date, device_id]
+            self.__database_engine.insert(name_device, columns, data_to_add)
 
-            if name_device == "Watteco":
+            """if name_device == "Watteco":
                 #list_recorded_data = self.watteco_decoder(data)
                 #new_record = record_data(date, list_recorded_data)
                 #self.__sensors_db.get_devices()[device_id].add_data(new_record)
-                self.__database_engine.insert("Watteco", ["Date", "DeviceId", "Temperature"], [date.strftime('%Y-%m-%d %H:%M:%S'), device_id, list_recorded_data[0].get_value()])
+                #self.__database_engine.insert("Watteco", ["Date", "DeviceId", "Temperature"], [date.strftime('%Y-%m-%d %H:%M:%S'), device_id, list_recorded_data[0].get_value()])
 
             elif name_device == "Adeunis" :
                 #list_recorded_data = self.adeunis_decoder(data)
                 #new_record = record_data(date, list_recorded_data)
                 #self.__sensors_db.get_devices()[device_id].add_data(new_record)
-                self.__database_engine.insert("Adeunis", ["Date", "DeviceId", "Temperature", "Latitude", "Longitude"], [date.strftime('%Y-%m-%d %H:%M:%S'), device_id, list_recorded_data[0].get_value(), list_recorded_data[1].get_value(), list_recorded_data[2].get_value()])
+                #self.__database_engine.insert("Adeunis", ["Date", "DeviceId", "Temperature", "Latitude", "Longitude"], [date.strftime('%Y-%m-%d %H:%M:%S'), device_id, list_recorded_data[0].get_value(), list_recorded_data[1].get_value(), list_recorded_data[2].get_value()])
+            """
 
     def get_sensors_db(self):
         return self.__sensors_db
