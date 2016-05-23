@@ -59,4 +59,4 @@ def recolt_xml():
 
 if __name__ == '__main__':
     #run(server='cherrypy', host='0.0.0.0', port=8080, debug=True)
-    run(host='0.0.0.0', port=8181, debug=True)
+    run(host='0.0.0.0', port=8080, debug=True)
