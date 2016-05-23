@@ -2,7 +2,7 @@
 # -*-coding:Utf-8 -*
 
 import database_manager
-from lxml import etree
+#from lxml import etree
 from datetime import datetime
 
 class raw_data:
@@ -213,12 +213,11 @@ class engine:
             downlink_counter = int(data[22:24], 16)
             battery= float(int(data[24:28], 16))/1000
 
-
-            latitude = float(latitude_degrees + "." + str(int(latitude_minutes)/60))
+            latitude = float(latitude_degrees + "." + str(int((int(latitude_minutes)/60)*10000000000)))
             if int(hemisphere_latitude) > 0:
                 latitude *= -1
 
-            longitude = float(longitude_degrees + "." + str(int(longitude_minutes)/60))
+            longitude = float(longitude_degrees + "." + str(int((int(longitude_minutes)/60)*10000000000)))
             if int(hemisphere_longitude) > 0:
                 longitude *= -1
 
@@ -238,14 +237,14 @@ class engine:
     def new_device(self, name, device_id):
         """ This function create and add a new sensor to the database sensors object """
 
-        if (self.__sensors_db.get_devices().has_key(device_id)):
-            print "Device [%s] %s already in the object device list" %(device_id, name)
+        if (device_id in self.__sensors_db.get_devices()):
+            print ("Device [%s] %s already in the object device list" %(device_id, name))
         else:
             new_sensor = sensor_device(name, device_id)
             self.__sensors_db.add_device(new_sensor)
 
         if not self.__database_engine.data_exist("Device", device_id):
-            print "[%s]%s already in the database"%(device_id, name)
+            print ("[%s]%s already in the database"%(device_id, name))
         else:
             self.__database_engine.insert("Device", ["Id", "Model"], [device_id, name])
 
@@ -271,7 +270,7 @@ class engine:
         self.__database_engine.get_columns("Watteco")
 
         if not self.__database_engine.record_exist(name_device, date): # Test if the record isn't exist by comparing the dates.
-            print "Record from %s the %s already in the database."%(name_device, date)
+            print ("Record from %s the %s already in the database."%(name_device, date))
         else :
             columns = self.__database_engine.get_columns(name_device)
             data_to_add = raw_list + [date, device_id]

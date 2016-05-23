@@ -29,9 +29,9 @@ class Database_Engine:
         self.create_table("Device", ["Id CHAR(50) PRIMARY KEY","Model CHAR(50) NOT NULL"])
 
         if not sensors_dic:
-            print "The sensor dictionnary is empty."
+            print("The sensor dictionnary is empty.")
         else:
-            print "The sensor dictionnary isn't empty."
+            print("The sensor dictionnary isn't empty.")
 
     def create_table(self, table_name, list_data):
         request = "CREATE TABLE IF NOT EXISTS %s (" %(table_name)
@@ -77,12 +77,12 @@ class Database_Engine:
                         request = request + str(list_value_data[i]) + ")"
                 i+=1
 
-            print request
+            print(request)
             self.db.execute(request)
             self.db.commit()
 
         else:
-            print "Error, the data is already in the database."
+            print("Error, the data is already in the database.")
 
 
     def data_exist(self, table, key):
