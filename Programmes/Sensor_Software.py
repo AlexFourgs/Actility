@@ -56,6 +56,21 @@ def recolt_xml():
     else :
         print "Error, it's not a xml file\n"
 
+@route("/", method="GET")
+def get_str():
+    ip = request.environ.get('REMOTE_ADDR')
+    print "This is a request get from " + ip
+
+@route("/", method="DELETE")
+def del_str():
+    ip = request.environ.get('REMOTE_ADDR')
+    print "This is a request get from " + ip
+
+@route("/", method="PUT")
+def put_str():
+    ip = request.environ.get('REMOTE_ADDR')
+    print "This is a request get from " + ip
+
 
 if __name__ == '__main__':
     #run(server='cherrypy', host='0.0.0.0', port=8080, debug=True)
