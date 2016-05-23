@@ -51,7 +51,7 @@ def recolt_xml():
     if request.headers['Content-Type'] == "text/xml":
         file_xml = request.body.read()
         save_data_file(file_xml)
-        print("This is an xml file !\nXML FILE : " + file_xml)
+        print("This is an xml file !\nXML FILE : " + file_xml.decode("utf-8"))
     else :
         print("Error, it's not a xml file\n")
 
