@@ -2,7 +2,7 @@
 # -*-coding:Utf-8 -*
 
 import client_engine, os, time
-from bottle import route, run, request
+from bottle import route, run, request, response
 
 """class software:
     """"""
@@ -48,12 +48,14 @@ def save_data_file(self, xml_file=""):
 def recolt_xml():
     ip = request.environ.get('REMOTE_ADDR')
     print("Post receive from " + ip)
-    if request.headers['Content-Type'] == "text/xml":
-        file_xml = request.body.read()
-        save_data_file(file_xml)
-        print("This is an xml file !\nXML FILE : " + file_xml.decode("utf-8"))
-    else :
-        print("Error, it's not a xml file\n")
+    device_id = request.query.LrnDevEui
+    print(device_id)
+    #if request.headers['Content-Type'] == "text/xml":
+    #file_xml = request.body.read()
+    #save_data_file(file_xml)
+    #    print("This is an xml file !\nXML FILE : " + file_xml.decode("utf-8"))
+    #else :
+    #    print("Error, it's not a xml file\n")
 
 @route("/", method="GET")
 def get_str():
