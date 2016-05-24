@@ -50,6 +50,7 @@ def recolt_xml():
     print("Post receive from " + ip)
     device_id = request.query.LrnDevEui
     print(device_id)
+    print(request.headers)
     #if request.headers['Content-Type'] == "text/xml":
     #file_xml = request.body.read()
     #save_data_file(file_xml)
