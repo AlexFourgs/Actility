@@ -53,7 +53,9 @@ def recolt_xml():
     device_id = request.query.LrnDevEui
 
     if(request.headers['Content-Type'] == "application/xml"):
+        print("This is an xml\n")
         file_xml = request.body.read()
+        print(file_xml)
         save_data_file(file_xml)
     else :
         print("Error, it's not a xml file\nFile rejected.\n")
