@@ -46,36 +46,24 @@ def save_data_file(self, xml_file=""):
 # curl -X POST --header "Content-Type:text/xml;charset=UTF-8" --data @test_xml.xml http://192.168.1.20:8080/listener
 @route("/", method="POST")
 def recolt_xml():
+
     ip = request.environ.get('REMOTE_ADDR')
-    print("Post receive from " + ip)
+    print("Post receive from %s\n"%(ip))
+
     device_id = request.query.LrnDevEui
-    print(device_id)
 
-    for key, value in request.headers.items():
-        print("%s : %s"%(key, value))
+    if(request.headers['Content-Type'] == "application/xml"):
+        file_xml = request.body.read()
+        save_data_file(file_xml)
+    else :
+        print("Error, it's not a xml file\nFile rejected.\n")
+        #TODO: Write it into log file
 
-    #if request.headers['Content-Type'] == "text/xml":
-    #file_xml = request.body.read()
-    #save_data_file(file_xml)
-    #    print("This is an xml file !\nXML FILE : " + file_xml.decode("utf-8"))
-    #else :
-    #    print("Error, it's not a xml file\n")
 
 @route("/", method="GET")
 def get_str():
     ip = request.environ.get('REMOTE_ADDR')
     print("This is a request get from " + ip)
-
-@route("/", method="DELETE")
-def del_str():
-    ip = request.environ.get('REMOTE_ADDR')
-    print("This is a request get from " + ip)
-
-@route("/", method="PUT")
-def put_str():
-    ip = request.environ.get('REMOTE_ADDR')
-    print("This is a request get from " + ip)
-
 
 if __name__ == '__main__':
     #run(server='cherrypy', host='0.0.0.0', port=8080, debug=True)
