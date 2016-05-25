@@ -5,8 +5,9 @@ import logging
 
 def init_log(logger_name, log_file):
     """Initialise the server logger and return it."""
-    del(logger.handlers)
     logger = logging.getLogger(logger_name)
+    if len(logger.handlers):
+        del(logger.handlers)
     log_format = logging.Formatter("[%(asctime)s] %(levelname)s :: %(message)s")
     log_file = "/var/log/" + log_file
     handler_server = logging.FileHandler(log_file, mode="a", encoding="utf-8") # Only work for linux system
