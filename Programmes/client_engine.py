@@ -351,6 +351,7 @@ class Engine:
             new_xml_file.write(xml_file)
 
         new_xml_file.close()
+        return file_name
 
 
 if __name__ == '__main__':
