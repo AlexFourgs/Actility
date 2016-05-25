@@ -25,6 +25,7 @@ def listener():
         logger.warning("Class.Server :: listener :: HTTP POST REQUEST received from %s but body isn't a xml file. Rejected."%(ip))
 
 if __name__ == '__main__':
+    logger.propagate = False
     engine = client_engine.Engine()
     logger_initializer.init_log("as_server", "as_server.log")
     start_server()
