@@ -5,6 +5,7 @@ import logging
 
 def init_log(logger_name, log_file):
     """Initialise the server logger and return it."""
+    del(logger.handlers)
     logger = logging.getLogger(logger_name)
     log_format = logging.Formatter("[%(asctime)s] %(levelname)s :: %(message)s")
     log_file = "/var/log/" + log_file
@@ -12,6 +13,7 @@ def init_log(logger_name, log_file):
     handler_server.setFormatter(log_format)
     handler_server.setLevel(logging.INFO)
     logger.setLevel(logging.INFO)
-    logger.addHandler(handler_server)
+    if not len(logger.handlers):
+        logger.addHandler(handler_server)
 
     return logger
