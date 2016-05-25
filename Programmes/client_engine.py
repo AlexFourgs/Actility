@@ -1,7 +1,7 @@
 #!/usr/bin/python3.4
 # -*-coding:Utf-8 -*
 
-import database_manager
+import database_manager, logging, logger_initializer
 from lxml import etree
 from datetime import datetime
 from io import StringIO
@@ -156,8 +156,9 @@ class Engine:
     """
 
     def __init__(self):
+        self.logger = logger_initializer.init_log("as_engine", "as_engine.log")
         self.__sensors_db = Sensors()
-        self.__database_engine = database_manager.Database_Engine()
+        self.__database_engine = database_manager.DatabaseEngine()
 
     def general_engine(self, xml_file):
         """Method that receive the xml file and calls every function to get data and save it into the database"""
@@ -175,6 +176,7 @@ class Engine:
             new_xml_file.write(xml_file)
 
         new_xml_file.close()
+        self.logger.info("Class.Engine :: save_data_file :: Save a new .xml file.")
         return file_name
 
     def parse_xml(self, file):
@@ -201,6 +203,7 @@ class Engine:
             elif(sub_element.tag[30:] == "payload_hex"):
                 payload = sub_element.text
 
+        self.logger.info("Class.Engine ::parse_xml :: Parse .xml file.")
         return (device_id, date, payload)
 
     def watteco_decoder(self, data):
@@ -208,8 +211,7 @@ class Engine:
         length_data = len(data)
 
         if length_data != 114 :
-            #TODO: Write it into as_engine.log
-            return "Error, payload size is not correct."
+            self.logger.warning("Class.Engine :: watteco_decoder :: Payload lenght isn't correct.")
         else :
             # Decoding the payload.
             version = int(data[0])
@@ -235,7 +237,7 @@ class Engine:
         """Method for decode the hex payload from an Adeunis LoRaWan Demonstrator sensor"""
 
         length_data = len(data)
-        print(length_data)
+
         if length_data == 16 : # Only temperature
             temp = float(int(data[2:4], 16))
             uplink_counter = int(data[4:6], 16)
@@ -247,7 +249,6 @@ class Engine:
             new_data = RawData("Longitude", longitude)
             new_data_2 = RawData("Latitude", latitude)
             new_data_3 = RawData("Temperature", temp)
-
 
             list_recorded_data=[new_data, new_data_2, new_data_3]
 
@@ -282,22 +283,19 @@ class Engine:
             return list_recorded_data
 
         else :
-            #TODO: Write it into as_engine.log
-            return "Error, payload size is not correct."
+            self.logger.info("Class.Engine :: adeunis_decoder :: Payload lenght isn't correct")
 
     def new_device(self, name, device_id):
         """ This method creates and add a new sensor object to the database Sensors object """
 
         if (device_id in self.__sensors_db.get_devices()):
-            #TODO: Write it into as_engine.log
-            print ("Device [%s] %s already in the object device list" %(device_id, name))
+            self.logger.info("Class.Engine :: new_device :: Device [%s] %s already in the object device list"%(device_id, name))
         else:
             new_sensor = SensorDevice(name, device_id)
             self.__sensors_db.add_device(new_sensor)
 
         if not self.__database_engine.data_exist("Device", device_id):
-            #TODO: Write it into as_engine.log
-            print ("[%s]%s already in the database"%(device_id, name))
+            self.logger.info("Class.Engine :: new_device :: Device [%s] %s already in the sqlite database"%(device_id, name))
         else:
             self.__database_engine.insert("Device", ["Id", "Model"], [device_id, name])
 
@@ -323,8 +321,7 @@ class Engine:
         self.__database_engine.get_columns("Watteco")
 
         if not self.__database_engine.record_exist(name_device, date): # Test if the record isn't exist by comparing the dates.
-            #TODO: Write it into as_engine.log
-            print ("Record from %s the %s already in the database."%(name_device, date))
+            self.logger.info("Class.Engine :: new_device :: Record from %s the %s already in the sqlite database."%(name_device, date))
         else :
             columns = self.__database_engine.get_columns(name_device)
             data_to_add = raw_list + [date, device_id]

@@ -1,7 +1,7 @@
 #!/usr/bin/python3.4
 # -*-coding:Utf-8 -*
 
-import sqlite3, os
+import sqlite3, os, logging, logger_initializer
 
 class Database_Engine:
     # /home/alex/Documents/Cours/Stage Travaux/Actility/Programmes/DataBase/
@@ -14,6 +14,7 @@ class Database_Engine:
     """
 
     def __init__(self):
+        self.logger = logger_initializer.init_log("as_database", "as_database.log")
         if not os.path.exists("./DataBase/SensorsData.db"):
             self.create_database();
         else:
@@ -29,10 +30,7 @@ class Database_Engine:
         self.create_table("Device", ["Id CHAR(50) PRIMARY KEY","Model CHAR(50) NOT NULL"])
 
         if not sensors_dic:
-            #TODO: Add this into logfile as_database.log
-            print("The sensor dictionnary is empty.")
-        else:
-            print("The sensor dictionnary isn't empty.")
+            self.logger.warning("Class.DatabaseEngine :: create_database :: sensors_dic object is empty.")
 
     def create_table(self, table_name, list_data):
         """Method that creates a new table if she doesn't exist."""
@@ -85,8 +83,7 @@ class Database_Engine:
             self.db.commit()
 
         else:
-            print("Error, the data is already in the database.")
-
+            self.logger.warning("Class.DatabaseEngine :: insert :: Try to add a value already in the database.")
 
     def data_exist(self, table, key):
         """Method that returns if the data exist by comparing the IDs"""
@@ -99,7 +96,6 @@ class Database_Engine:
             return True
         else:
             return False
-
 
     def record_exist(self, table, date):
         """Method that returns if the record in the table exist by comparing the dates"""
@@ -123,19 +119,18 @@ class Database_Engine:
         columns.pop() # Remove the last element of the list which is the primary key column name
         return columns
 
-    """
-    def delete_table(self):
-        # TODO
 
-    def delete_data(self):
-        # TODO
-
-    def edit(self):
-        # TODO
-
-    def get_db(self):
-        return self.db
-    """
+#    def delete_table(self):
+#        # TODO
+#
+#    def delete_data(self):
+#        # TODO
+#
+#    def edit(self):
+#        # TODO
+#
+#    def get_db(self):
+#        return self.db
 
     def close_connection(self):
         self.db.close()
@@ -143,7 +138,7 @@ class Database_Engine:
 if __name__ == '__main__' :
     print("DATABASE MANAGER")
 
-    database_engine = database_engine()
+    database_engine = DatabaseEngine()
     database_engine.create_table("Device", ["Id CHAR(50) PRIMARY KEY","Model CHAR(50) NOT NULL"])
     database_engine.insert("Device", ["Id", "Model"], ["0018B20000000167", "Adeunis"])
     database_engine.close_connection()
