@@ -21,7 +21,7 @@ class Database_Engine:
 
     def create_database(self, sensors_dic={}):
         """
-            This function create the database if she doesn't exist.
+            This method creates the database if she doesn't exist.
             She's executed only the first time you execute the software on a new machine.
             She creates the devices table and the data's table for each device.
         """
@@ -29,11 +29,13 @@ class Database_Engine:
         self.create_table("Device", ["Id CHAR(50) PRIMARY KEY","Model CHAR(50) NOT NULL"])
 
         if not sensors_dic:
+            #TODO: Add this into logfile as_database.log
             print("The sensor dictionnary is empty.")
         else:
             print("The sensor dictionnary isn't empty.")
 
     def create_table(self, table_name, list_data):
+        """Method that creates a new table if she doesn't exist."""
         request = "CREATE TABLE IF NOT EXISTS %s (" %(table_name)
         i = 0
         while i < len(list_data):
@@ -47,6 +49,7 @@ class Database_Engine:
         self.db.commit()
 
     def insert(self, table_name, list_value_to_add, list_value_data):
+        """Method that add a new line into a table"""
         exist = "SELECT * FROM %s WHERE \'Date\'=\'%s\'"%(table_name, list_value_data[0])
         select = self.db.cursor()
         select.execute(exist)
@@ -86,6 +89,7 @@ class Database_Engine:
 
 
     def data_exist(self, table, key):
+        """Method that returns if the data exist by comparing the IDs"""
         request = "SELECT * FROM \'%s\' WHERE Id = \'%s\'"%(table, key)
         select = self.db.cursor()
         select.execute(request)
@@ -98,6 +102,7 @@ class Database_Engine:
 
 
     def record_exist(self, table, date):
+        """Method that returns if the record in the table exist by comparing the dates"""
         request = "SELECT * FROM \'%s\' WHERE Date = \'%s\'"%(table, date)
         select = self.db.cursor()
         select.execute(request)
@@ -109,6 +114,7 @@ class Database_Engine:
             return False
 
     def get_columns(self, table):
+        """Methods that return all columns name from the table"""
         columns = []
 
         for row in self.db.execute("pragma table_info('%s')"%(table)).fetchall():
