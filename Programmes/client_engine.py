@@ -2,8 +2,9 @@
 # -*-coding:Utf-8 -*
 
 import database_manager
-#from lxml import etree
+from lxml import etree
 from datetime import datetime
+from io import StringIO
 
 class raw_data:
     """
@@ -132,7 +133,7 @@ class sensors:
         return list_str
 
 
-class engine:
+class Engine:
     """
         This object is the engine of the software that gathering data from http request post.
         His role is to :
@@ -147,9 +148,50 @@ class engine:
         self.__sensors_db = sensors()
         self.__database_engine = database_manager.Database_Engine()
 
+
+    def general_engine(self, xml_file):
+        """Function that receive the xml file and calls every function to get data and save it into the database"""
+        data_from_xml = self.parse_xml(xml_file)
+        self.decode_and_add_record(data_from_xml[0], data_from_xml[1], data_from_xml[2])
+
+    def save_data_file(self, xml_file):
+        """ This function create a xml file with the DATA from the POST method and save it into the path DATA """
+
+        # We take the date for named the new xml file.
+        date = time.localtime()
+        file_name = "./DATA/" + str(date.tm_mday) + "_" + str(date.tm_mon) + "_" + str(date.tm_year) + "_" + str(date.tm_hour) + "_" + str(date.tm_min) + "_" + str(date.tm_sec)
+
+        with open(file_name, "w") as new_xml_file:
+            new_xml_file.write(xml_file)
+
+        new_xml_file.close()
+        return file_name
+
     def parse_xml(self, file):
-        # TODO write this function.
-        pass
+        """Function that parse the xml file"""
+
+        with open(file) as xml_file:
+            xml = xml_file.read()
+
+        xml_file.close()
+
+        root = etree.fromstring(xml)
+
+        for sub_element in root:
+            if(sub_element.tag[30:] == "Time"):
+                year = int(sub_element.text[:4])
+                month = int(sub_element.text[5:7])
+                day = int(sub_element.text[8:10])
+                hour = int(sub_element.text[11:13])
+                minute = int(sub_element.text[14:16])
+                second = int(sub_element.text[17:19])
+                date = datetime(year, month, day, hour, minute, second)
+            elif(sub_element.tag[30:] == "DevEUI"):
+                device_id = sub_element.text
+            elif(sub_element.tag[30:] == "payload_hex"):
+                payload = sub_element.text
+
+        return (device_id, date, payload)
 
     def watteco_decoder(self, data):
         """Function that decode the hex data from a Watteco 3.1 sensor"""
@@ -182,8 +224,8 @@ class engine:
         """Function that decode the hex data from an Adeunis LoRaWan Demonstrator sensor"""
 
         length_data = len(data)
-
-        if length_data == 12 : # Only temperature
+        print(length_data)
+        if length_data == 16 : # Only temperature
             temp = float(int(data[2:4], 16))
             uplink_counter = int(data[4:6], 16)
             downlink_counter = int(data[6:8], 16)
@@ -199,7 +241,6 @@ class engine:
             list_recorded_data=[new_data, new_data_2, new_data_3]
 
             return list_recorded_data
-
 
         elif length_data == 28 : # Temperature + GPS
             temp = int(data[2:4], 16)
@@ -232,8 +273,6 @@ class engine:
         else :
             return "Error, payload size is not correct."
 
-        # TODO : Créer l'objet et l'ajouter à la DB
-
     def new_device(self, name, device_id):
         """ This function create and add a new sensor to the database sensors object """
 
@@ -248,15 +287,15 @@ class engine:
         else:
             self.__database_engine.insert("Device", ["Id", "Model"], [device_id, name])
 
-
     def decode_and_add_record(self, device_id, date, data):
         date = date.strftime('%Y-%m-%d %H:%M:%S')
+        print(date, data)
         name_device = self.__sensors_db.get_devices()[device_id].get_name()
 
         name_decoder_function = name_device.lower() + "_decoder"
         decode = getattr(self, name_decoder_function)
         list_recorded_data = decode(data)
-
+        print(type(list_recorded_data))
         raw_list = []
         i = 0
         while i < len(list_recorded_data):
@@ -275,19 +314,6 @@ class engine:
             columns = self.__database_engine.get_columns(name_device)
             data_to_add = raw_list + [date, device_id]
             self.__database_engine.insert(name_device, columns, data_to_add)
-
-            """if name_device == "Watteco":
-                #list_recorded_data = self.watteco_decoder(data)
-                #new_record = record_data(date, list_recorded_data)
-                #self.__sensors_db.get_devices()[device_id].add_data(new_record)
-                #self.__database_engine.insert("Watteco", ["Date", "DeviceId", "Temperature"], [date.strftime('%Y-%m-%d %H:%M:%S'), device_id, list_recorded_data[0].get_value()])
-
-            elif name_device == "Adeunis" :
-                #list_recorded_data = self.adeunis_decoder(data)
-                #new_record = record_data(date, list_recorded_data)
-                #self.__sensors_db.get_devices()[device_id].add_data(new_record)
-                #self.__database_engine.insert("Adeunis", ["Date", "DeviceId", "Temperature", "Latitude", "Longitude"], [date.strftime('%Y-%m-%d %H:%M:%S'), device_id, list_recorded_data[0].get_value(), list_recorded_data[1].get_value(), list_recorded_data[2].get_value()])
-            """
 
     def get_sensors_db(self):
         return self.__sensors_db
@@ -309,18 +335,24 @@ class engine:
 
 
 if __name__ == '__main__':
-    engine = engine()
+    engine = Engine()
 
-    ## Test d'ajout de device.
+    # Test parsing xml.
+    engine.parse_xml("./xml.xml")
+
+    ## Test adding device.
     engine.new_device("Adeunis", "0018B20000000167")
     engine.new_device("Adeunis", "0018B20000000167") # insert error check
     engine.new_device("Watteco", "70B3D5E75E000239")
     device_db_object = engine.get_sensors_db()
 
-    ## Tests des fonctions de décodage de payload et d'ajout dans les objets.
-    engine.decode_and_add_record("0018B20000000167", datetime(2016, 1, 1, 0, 0, 0), "8e3036840b05")
+    ## Tests decode functions.
+    engine.decode_and_add_record("0018B20000000167", datetime(2016, 1, 1, 0, 0, 0), "8e3036840b050000")
     engine.decode_and_add_record("0018B20000000167", datetime(2016, 1, 2, 0, 0, 1), "9e31485592200021746034830b1c")
     engine.decode_and_add_record("70B3D5E75E000239", datetime(2016, 1, 3, 0, 0, 2), "6000000000111140000000000000000070b3d5e75e0002390000000000000000000000ff00000000f0b5f0b400111b79110a0402000029091d")
     # Latitude : 48559220
     # Long : 00217460
+
+    engine.general_engine("./xml.xml")
+
     engine.close_database_connection()
