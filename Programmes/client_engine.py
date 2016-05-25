@@ -34,14 +34,13 @@ class RecordData:
     """
 
     def __init__(self, date, data_list):
+        self.logger = logger_initializer.init_log("as_engine", "as_engine.log")
         self.date = date
         # Verifying that "data_list" is a list .
         if isinstance(data_list, list):
                 self.data_list = data_list # List of object "RawData"
         else:
-            #TODO: Write it into as_engine.log
-            return "Error while creating the RecordData object.\n data_list type : %s\nWaiting an object [LIST]\n" %(type(data_list))
-
+            self.logger.warning("Class.RecordData :: __init__ :: Error while creating the RecordData object. data_list type : [%s] Waiting an object [LIST]" %(type(data_list)))
 
     def get_date(self):
         """Return the record date"""
@@ -69,6 +68,7 @@ class SensorDevice:
     """
 
     def __init__(self, model, device_id):
+        self.logger = logger_initializer.init_log("as_engine", "as_engine.log")
         self.__model = model
         self.__device_id = device_id
         self.__data_list = [] # List of object "RecordData"
@@ -79,9 +79,7 @@ class SensorDevice:
         if isinstance(data, RecordData):
             self.__data_list.append(data)
         else:
-            #TODO: Write it into as_engine.log as
-            return "Error while adding the data object into data_list.\n data type : %s\nWaiting an object [RecordData]\n" %(type(data))
-
+            self.logger.warning("Class.SensorDevice :: add_data :: Error while adding the data object into data_list. Data type : [%s] Waiting an object [RecordData]" %(type(data)))
 
     def number_of_registered_data(self):
         """ Return a string with the number of recorded data from the device """
@@ -111,6 +109,7 @@ class Sensors:
     """
 
     def __init__(self):
+        self.logger = logger_initializer.init_log("as_engine", "as_engine.log")
         self.devices = {}
 
     def add_device(self, device):
@@ -120,8 +119,7 @@ class Sensors:
         if isinstance(device, SensorDevice):
             self.devices[device.get_device_id()] = device
         else:
-            #TODO: Write it into a as_engine.log
-            return "Error while adding the device object into devices.\n device type : %s\nWaiting an object [SensorDevice]\n" %(type(device))
+            self.logger.warning("Class.Sensors :: add_data :: Error while adding the device object into devices. Device type : [%s] Waiting an object [SensorDevice]" %(type(device)))
 
     def add_data(self, data, device_id):
         """ Method that add a new RecordData into the recorded data list of the device """
@@ -129,8 +127,7 @@ class Sensors:
         if isinstance(data, RecordData):
             self.devices[device_id].add_data(data)
         else:
-            #TODO: Write it into a as_engine.log
-            return "Error while adding the data object into data_list.\n data type : %s\nWaiting an object [RecordData]\n" %(type(data))
+            self.logger.warning("Class.Sensors :: add_data :: Error while adding the data object into data_list. Data type : [%s] Waiting an object [RecordData]" %(type(data)))
 
     def get_devices(self):
         """ Return the dictionnary of the devices as values and the IDs as keys """
@@ -193,8 +190,6 @@ class Engine:
             xml = xml_file.read()
 
         xml_file.close()
-
-        print xml
 
         root = etree.fromstring(xml)
 
