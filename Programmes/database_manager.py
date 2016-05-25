@@ -3,7 +3,7 @@
 
 import sqlite3, os, logging, logger_initializer
 
-class Database_Engine:
+class DatabaseEngine:
     # /home/alex/Documents/Cours/Stage Travaux/Actility/Programmes/DataBase/
     """
         This object is the database engine, his role is to :
