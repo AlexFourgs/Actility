@@ -1,7 +1,8 @@
 #!/usr/bin/python3.4
 # -*-coding:Utf-8 -*
 
-import logging, logging.handlers
+import logging
+from logging import handlers
 
 def init_log(logger_name, log_file):
     """Initialise the server logger and return it."""

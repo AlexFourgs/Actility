@@ -1,10 +1,10 @@
 #!/usr/bin/python3.4
 # -*-coding:Utf-8 -*
 
-import database_manager, logging, logging.handlers, logger_initializer
+import database_manager, logging, logger_initializer, time
+from logging import handlers
 from lxml import etree
 from datetime import datetime
-import time
 from io import StringIO
 
 class RawData:
