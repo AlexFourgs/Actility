@@ -4,6 +4,7 @@
 import database_manager, logging, logger_initializer
 from lxml import etree
 from datetime import datetime
+import time
 from io import StringIO
 
 class RawData:
