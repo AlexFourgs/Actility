@@ -160,6 +160,8 @@ class Engine:
         self.logger = logger_initializer.init_log("as_engine", "as_engine.log")
         self.__sensors_db = Sensors()
         self.__database_engine = database_manager.DatabaseEngine()
+        self.new_device("Adeunis", "0018B20000000167")
+        self.new_device("Watteco", "70B3D5E75E000239")
 
     def general_engine(self, xml_file):
         """Method that receive the xml file and calls every function to get data and save it into the database"""
@@ -183,10 +185,16 @@ class Engine:
     def parse_xml(self, file):
         """Method for parse the xml file"""
 
+        date = datetime(2000, 1, 1, 0, 0, 0)
+        device_id = ""
+        payload = ""
+
         with open(file) as xml_file:
             xml = xml_file.read()
 
         xml_file.close()
+
+        print xml
 
         root = etree.fromstring(xml)
 
@@ -303,7 +311,7 @@ class Engine:
     def decode_and_add_record(self, device_id, date, data):
         """This method decodes the payload, creates the objects related and add them into the databases"""
         date = date.strftime('%Y-%m-%d %H:%M:%S')
-        name_device = self.__sensors_db.get_devices()[device_id].get_name()
+        name_device = self.__sensors_db.get_devices()[device_id].get_model()
 
         name_decoder_function = name_device.lower() + "_decoder"
         decode = getattr(self, name_decoder_function)
