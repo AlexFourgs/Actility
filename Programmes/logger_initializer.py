@@ -7,7 +7,7 @@ from logging import handlers
 def init_log(logger_name, log_file):
     """Initialise the server logger and return it."""
     logger = logging.getLogger(logger_name)
-    if len(logger.handlers):
+    if len(logging.handlers):
         del(logger.handlers)
     log_format = logging.Formatter("[%(asctime)s] %(levelname)s :: %(message)s")
     log_file = "/var/log/" + log_file
@@ -15,7 +15,7 @@ def init_log(logger_name, log_file):
     handler_server.setFormatter(log_format)
     handler_server.setLevel(logging.INFO)
     logger.setLevel(logging.INFO)
-    if not len(logger.handlers):
+    if not len(logging.handlers):
         logger.addHandler(handler_server)
 
     return logger
