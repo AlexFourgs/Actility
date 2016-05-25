@@ -1,7 +1,7 @@
 #!/usr/bin/python3.4
 # -*-coding:Utf-8 -*
 
-import database_manager, logging, logger_initializer
+import database_manager, logging, logging.handlers, logger_initializer
 from lxml import etree
 from datetime import datetime
 import time

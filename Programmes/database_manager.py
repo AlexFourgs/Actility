@@ -1,7 +1,7 @@
 #!/usr/bin/python3.4
 # -*-coding:Utf-8 -*
 
-import sqlite3, os, logging, logger_initializer
+import sqlite3, os, logging, logging.handlers, logger_initializer
 
 class DatabaseEngine:
     # /home/alex/Documents/Cours/Stage Travaux/Actility/Programmes/DataBase/
