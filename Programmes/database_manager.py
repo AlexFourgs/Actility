@@ -15,7 +15,7 @@ class DatabaseEngine:
     """
 
     def __init__(self):
-        self.logger = logger_initializer.init_log("as_database", "as_database.log")
+        #self.logger = logger_initializer.init_log("as_database", "as_database.log")
         if not os.path.exists("./DataBase/SensorsData.db"):
             self.create_database();
         else:
@@ -31,7 +31,8 @@ class DatabaseEngine:
         self.create_table("Device", ["Id CHAR(50) PRIMARY KEY","Model CHAR(50) NOT NULL"])
 
         if not sensors_dic:
-            self.logger.warning("Class.DatabaseEngine :: create_database :: sensors_dic object is empty.")
+            #self.logger.warning("Class.DatabaseEngine :: create_database :: sensors_dic object is empty.")
+            print("Error")
 
     def create_table(self, table_name, list_data):
         """Method that creates a new table if she doesn't exist."""
@@ -84,7 +85,8 @@ class DatabaseEngine:
             self.db.commit()
 
         else:
-            self.logger.warning("Class.DatabaseEngine :: insert :: Try to add a value already in the database.")
+            #self.logger.warning("Class.DatabaseEngine :: insert :: Try to add a value already in the database.")
+            print("Error")
 
     def data_exist(self, table, key):
         """Method that returns if the data exist by comparing the IDs"""
