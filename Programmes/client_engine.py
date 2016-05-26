@@ -245,10 +245,10 @@ class Engine:
     def adeunis_decoder(self, data):
         """Method for decode the hex payload from an Adeunis LoRaWan Demonstrator sensor"""
 
-        print(data)
+        #print(data)
         length_data = len(data)
 
-        if ((length_data == 16) or (lenght_data == 12)): # Only temperature
+        if ((length_data == 16) or (length_data == 12)): # Only temperature
             temp = float(int(data[2:4], 16))
             uplink_counter = int(data[4:6], 16)
             downlink_counter = int(data[6:8], 16)
