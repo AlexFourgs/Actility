@@ -245,6 +245,7 @@ class Engine:
     def adeunis_decoder(self, data):
         """Method for decode the hex payload from an Adeunis LoRaWan Demonstrator sensor"""
 
+        print(data)
         length_data = len(data)
 
         if ((length_data == 16) or (lenght_data == 12)): # Only temperature
