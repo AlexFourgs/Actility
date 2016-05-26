@@ -34,13 +34,14 @@ class RecordData:
     """
 
     def __init__(self, date, data_list):
-        self.logger = logger_initializer.init_log("as_engine", "as_engine.log")
+        #self.logger = logger_initializer.init_log("as_engine", "as_engine.log")
         self.date = date
         # Verifying that "data_list" is a list .
         if isinstance(data_list, list):
                 self.data_list = data_list # List of object "RawData"
         else:
-            self.logger.warning("Class.RecordData :: __init__ :: Error while creating the RecordData object. data_list type : [%s] Waiting an object [LIST]" %(type(data_list)))
+            #self.logger.warning("Class.RecordData :: __init__ :: Error while creating the RecordData object. data_list type : [%s] Waiting an object [LIST]" %(type(data_list)))
+            print("error init recorddata")
 
     def get_date(self):
         """Return the record date"""
@@ -68,7 +69,7 @@ class SensorDevice:
     """
 
     def __init__(self, model, device_id):
-        self.logger = logger_initializer.init_log("as_engine", "as_engine.log")
+        #self.logger = logger_initializer.init_log("as_engine", "as_engine.log")
         self.__model = model
         self.__device_id = device_id
         self.__data_list = [] # List of object "RecordData"
@@ -79,7 +80,8 @@ class SensorDevice:
         if isinstance(data, RecordData):
             self.__data_list.append(data)
         else:
-            self.logger.warning("Class.SensorDevice :: add_data :: Error while adding the data object into data_list. Data type : [%s] Waiting an object [RecordData]" %(type(data)))
+            #self.logger.warning("Class.SensorDevice :: add_data :: Error while adding the data object into data_list. Data type : [%s] Waiting an object [RecordData]" %(type(data)))
+            print("error add_data sensordevice")
 
     def number_of_registered_data(self):
         """ Return a string with the number of recorded data from the device """
@@ -109,7 +111,7 @@ class Sensors:
     """
 
     def __init__(self):
-        self.logger = logger_initializer.init_log("as_engine", "as_engine.log")
+        #self.logger = logger_initializer.init_log("as_engine", "as_engine.log")
         self.devices = {}
 
     def add_device(self, device):
@@ -119,7 +121,8 @@ class Sensors:
         if isinstance(device, SensorDevice):
             self.devices[device.get_device_id()] = device
         else:
-            self.logger.warning("Class.Sensors :: add_data :: Error while adding the device object into devices. Device type : [%s] Waiting an object [SensorDevice]" %(type(device)))
+            #self.logger.warning("Class.Sensors :: add_data :: Error while adding the device object into devices. Device type : [%s] Waiting an object [SensorDevice]" %(type(device)))
+            print("error class sensors add_device")
 
     def add_data(self, data, device_id):
         """ Method that add a new RecordData into the recorded data list of the device """
@@ -127,7 +130,8 @@ class Sensors:
         if isinstance(data, RecordData):
             self.devices[device_id].add_data(data)
         else:
-            self.logger.warning("Class.Sensors :: add_data :: Error while adding the data object into data_list. Data type : [%s] Waiting an object [RecordData]" %(type(data)))
+            #self.logger.warning("Class.Sensors :: add_data :: Error while adding the data object into data_list. Data type : [%s] Waiting an object [RecordData]" %(type(data)))
+            print("Error add_data sensors")
 
     def get_devices(self):
         """ Return the dictionnary of the devices as values and the IDs as keys """
@@ -154,7 +158,7 @@ class Engine:
     """
 
     def __init__(self):
-        self.logger = logger_initializer.init_log("as_engine", "as_engine.log")
+        #self.logger = logger_initializer.init_log("as_engine", "as_engine.log")
         self.__sensors_db = Sensors()
         self.__database_engine = database_manager.DatabaseEngine()
         self.new_device("Adeunis", "0018B20000000167")
@@ -176,7 +180,7 @@ class Engine:
             new_xml_file.write(xml_file)
 
         new_xml_file.close()
-        self.logger.info("Class.Engine :: save_data_file :: Save a new .xml file.")
+        #self.logger.info("Class.Engine :: save_data_file :: Save a new .xml file.")
         return file_name
 
     def parse_xml(self, file):
@@ -207,7 +211,7 @@ class Engine:
             elif(sub_element.tag[30:] == "payload_hex"):
                 payload = sub_element.text
 
-        self.logger.info("Class.Engine ::parse_xml :: Parse .xml file.")
+        #self.logger.info("Class.Engine ::parse_xml :: Parse .xml file.")
         return (device_id, date, payload)
 
     def watteco_decoder(self, data):
@@ -215,7 +219,8 @@ class Engine:
         length_data = len(data)
 
         if length_data != 114 :
-            self.logger.warning("Class.Engine :: watteco_decoder :: Payload lenght isn't correct.")
+            #self.logger.warning("Class.Engine :: watteco_decoder :: Payload lenght isn't correct.")
+            print("Error watecco_decoder")
         else :
             # Decoding the payload.
             version = int(data[0])
@@ -287,19 +292,22 @@ class Engine:
             return list_recorded_data
 
         else :
-            self.logger.info("Class.Engine :: adeunis_decoder :: Payload lenght isn't correct")
+            #self.logger.info("Class.Engine :: adeunis_decoder :: Payload lenght isn't correct")
+            print("info adeunis decoder")
 
     def new_device(self, name, device_id):
         """ This method creates and add a new sensor object to the database Sensors object """
 
         if (device_id in self.__sensors_db.get_devices()):
-            self.logger.info("Class.Engine :: new_device :: Device [%s] %s already in the object device list"%(device_id, name))
+            #self.logger.info("Class.Engine :: new_device :: Device [%s] %s already in the object device list"%(device_id, name))
+            print("info new_device already in the object device list")
         else:
             new_sensor = SensorDevice(name, device_id)
             self.__sensors_db.add_device(new_sensor)
 
         if not self.__database_engine.data_exist("Device", device_id):
-            self.logger.info("Class.Engine :: new_device :: Device [%s] %s already in the sqlite database"%(device_id, name))
+            #self.logger.info("Class.Engine :: new_device :: Device [%s] %s already in the sqlite database"%(device_id, name))
+            print("Info new_device already in the database")
         else:
             self.__database_engine.insert("Device", ["Id", "Model"], [device_id, name])
 
@@ -325,7 +333,8 @@ class Engine:
         self.__database_engine.get_columns("Watteco")
 
         if not self.__database_engine.record_exist(name_device, date): # Test if the record isn't exist by comparing the dates.
-            self.logger.info("Class.Engine :: new_device :: Record from %s the %s already in the sqlite database."%(name_device, date))
+            #self.logger.info("Class.Engine :: new_device :: Record from %s the %s already in the sqlite database."%(name_device, date))
+            print("Info new_device already in the sqlite database")
         else :
             columns = self.__database_engine.get_columns(name_device)
             data_to_add = raw_list + [date, device_id]

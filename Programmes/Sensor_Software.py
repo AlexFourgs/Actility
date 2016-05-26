@@ -27,5 +27,6 @@ def listener():
 
 if __name__ == '__main__':
     engine = client_engine.Engine()
-    logger_initializer.init_log("as_server", "as_server.log")
+    #logger_initializer.init_log("as_server", "as_server.log")
+    #logging.basicConfig()
     start_server()
