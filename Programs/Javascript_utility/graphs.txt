@@ -1,0 +1,1 @@
+[{'title': 'Adeunis 0018B20000000167', 'balloonText': 'Value data of [[category]]: [[value]]', 'fillAlphas': 0, 'bullet': 'round', 'valueField': '0018B20000000167'}]

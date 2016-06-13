@@ -315,31 +315,34 @@ class Engine:
     def decode_and_add_record(self, device_id, date, data):
         """This method decodes the payload, creates the objects related and add them into the databases"""
         date = date.strftime('%Y-%m-%d %H:%M:%S')
-        name_device = self.__sensors_db.get_devices()[device_id].get_model()
+        name_device = self.__database_engine.get_device_model(device_id)
 
-        name_decoder_function = name_device.lower() + "_decoder"
-        decode = getattr(self, name_decoder_function)
-        list_recorded_data = decode(data)
+        if name_device != False :
+            name_decoder_function = name_device.lower() + "_decoder"
+            decode = getattr(self, name_decoder_function)
+            list_recorded_data = decode(data)
 
-        raw_list = []
-        i = 0
-        while i < len(list_recorded_data):
-            raw_list.append(list_recorded_data[i].get_value())
-            i += 1
+            raw_list = []
+            i = 0
+            while i < len(list_recorded_data):
+                raw_list.append(list_recorded_data[i].get_value())
+                i += 1
 
 
-        new_record = RecordData(date, list_recorded_data)
-        self.__sensors_db.get_devices()[device_id].add_data(new_record)
+            new_record = RecordData(date, list_recorded_data)
+            self.__sensors_db.get_devices()[device_id].add_data(new_record)
 
-        self.__database_engine.get_columns("Watteco")
+            self.__database_engine.get_columns("Watteco")
 
-        if not self.__database_engine.record_exist(name_device, date): # Test if the record isn't exist by comparing the dates.
-            #self.logger.info("Class.Engine :: new_device :: Record from %s the %s already in the sqlite database."%(name_device, date))
-            print("Info new_device already in the sqlite database")
-        else :
-            columns = self.__database_engine.get_columns(name_device)
-            data_to_add = raw_list + [date, device_id]
-            self.__database_engine.insert(name_device, columns, data_to_add)
+            if not self.__database_engine.record_exist(name_device, date): # Test if the record isn't exist by comparing the dates.
+                #self.logger.info("Class.Engine :: new_device :: Record from %s the %s already in the sqlite database."%(name_device, date))
+                print("Info new_device already in the sqlite database")
+            else :
+                columns = self.__database_engine.get_columns(name_device)
+                data_to_add = raw_list + [date, device_id]
+                self.__database_engine.insert(name_device, columns, data_to_add)
+        else:
+            print("%s ID unknow\n"%(device_id))
 
     def get_sensors_db(self):
         """Return the object oriented database of sensor"""
@@ -366,6 +369,17 @@ class Engine:
         new_xml_file.close()
         return file_name
 
+    def get_id_from_model(self, model):
+        return self.__database_engine.get_id_model(model)
+
+    def get_data_from_model(self, model):
+        return self.__database_engine.get_columns_data(model)
+
+    def get_data_for_graph(self, model, device_id, data, date_from, date_to):
+        return self.__database_engine.data_for_graph(model, device_id, data, date_from, date_to)
+
+
+
 
 if __name__ == '__main__':
     engine = Engine()
@@ -385,6 +399,10 @@ if __name__ == '__main__':
     engine.decode_and_add_record("70B3D5E75E000239", datetime(2016, 1, 3, 0, 0, 2), "6000000000111140000000000000000070b3d5e75e0002390000000000000000000000ff00000000f0b5f0b400111b79110a0402000029091d")
     # Latitude : 48559220
     # Long : 00217460
+
+
+    ## Test with unknow device id
+    engine.decode_and_add_record("0028B20000000167", datetime(2016, 1, 1, 0, 0, 0), "8e3036840b050000")
 
     engine.general_engine("./xml.xml")
 

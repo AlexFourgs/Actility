@@ -1,0 +1,373 @@
+<!doctype html>
+<!-- page.tpl -->
+<HTML lang="fr">
+  <HEAD>
+     <script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+     <script src="https://www.amcharts.com/lib/3/serial.js"></script>
+     <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
+
+     <title>
+       Actility : Data Viewer
+     </title>
+
+     <style>
+       html{
+         height: 100%;
+       }
+       header.back{
+         background-image: url("http://img11.hostingpics.net/pics/752023bgheader.jpg");
+         width: 100%;
+       }
+
+       img.header{
+         position: absolute;
+         top: 50%;
+       }
+
+       p.indent{
+         padding-left: 1.8em
+       }
+       .center{
+         text-align: center
+       }
+       #chartdiv {
+         width : 100%;
+         height : 500px;
+       }
+
+       select.data_list{
+         width: 100%;
+         height: 50%;
+       }
+       aside.onRight{
+         width: 15%;
+         margin: 0 1.5%;
+         float: right;
+       }
+
+       section.graphe{
+         width: 78%;
+         margin: 0 1.5%;
+         float: left;
+       }
+
+       p.footerText{
+         color:white;
+       }
+       footer.setBottom{
+         background-color: #333333;
+         height:150px;
+         position: absolute;
+         bottom: 0;
+         text-align: center;
+         width: 100%;
+       }
+
+       hr.footer{
+         text-align: center;
+         width: 75%;
+         border-color: #6290B3;
+       }
+
+       div.header {
+         min-height: 12em;
+         display: table-cell;
+         vertical-align: middle;
+       }
+
+     </style>
+
+     <meta charset="UTF-8">
+  </HEAD>
+
+  <body style="min-height:100%; margin:0; padding:0; position:relative; padding-bottom:10em;">
+    <header class="back">
+      <div class="header">
+        <p><div style="width:164px; height:75px; float: left; margin-left:40px;"><a href="http://www.actility.com/" target="_blank"><img style="float:left; width:100%; height:auto;" src="http://www.actility.com/sites/www.actility.com/files/logo2x.png" alt="Logo Actility" /></a></div><h1 style="text-align:center; color:white; font-family: Verdana; font-size:40px;">Data Viewer</h1></p>
+        <!--<img style="margin-left: auto; margin-right: auto;" src="./static/data_viewer_img" alt="Data Viewer" />-->
+      </div>
+    </header>
+    <br/>
+    <hr/>
+
+    <form class="center" method="post" action="./data" id="form_graph">
+      From : <input type="datetime-local" min="2010-01-01T00:00:00" step=1 value="2010-01-01T00:00:00" name="dateFrom" id="dateFrom"/>
+      To : <input type="datetime-local" min="2010-01-01T00:00:00" step=1 name="dateTo" id="dateTo"/>
+      Model : <select name="model" id="model"><option value="None" selected></option><option value="Adeunis">Adeunis</option><option value="Watteco">Watteco</option></select>
+      ID : <select name="ID" id="ID"><option value="None" selected>Please select a model</option></select>
+      Data : <select name="Data" id="Data"><option value="None" selected>Please select a model</option></select>
+      <input id="Add" type="submit" name="Add" value="Add">
+    </form>
+
+    <hr/>
+    <p>
+      <section class="graphe">
+        <div id="chartdiv"></div>
+      </section>
+      <aside class="onRight">
+        <form method="post" action="./data" id="list_box">
+          <select class="data_list" name="list_data_selected" size="25" id="list_data_selected">
+          </select>
+          <br/>
+          <div class="center"><input id="Delete" type="submit" name="Delete" value="Delete" disabled="disabled"></div>
+        </form>
+      </aside>
+
+      <div class="clear" style="clear:both"></div>
+
+      <footer class="setBottom">
+        <p><a href="http://www.thingpark.com/" target="_blank"><img src="http://www.actility.com/sites/www.actility.com/files/styles/blanc/public/logo/tp.png?itok=IYXxKCyf" alt="Logo Actility" /></a></p>
+        <hr class="footer"/>
+        <p class="footerText"><font size="-1"><i>Page réalisée par <a href="https://www.linkedin.com/in/alexandre-fourgs-14323711a" target="_blank">Alexandre Fourgs</a> pour Actility.</i></font></p>
+      </footer>
+
+      <p hidden style="display:none;" id="data_provider">{{data_provider}}</p>
+      <p hidden style="display:none;" id="graphs">{{graphs}}</p>
+      <p hidden style:"display:none;" id="value_axis_title">{{value_axis_title}}</p>
+    </p>
+
+    <script charset="UTF-8">
+      // form document
+      var form = document.getElementById("form_graph");
+
+      // We create a variable for survey the list and a event listener
+      var model_list = document.getElementById("model");
+      var id_list = document.getElementById("ID");
+      var data_list = document.getElementById("Data");
+      var date_from = document.getElementById("dateFrom");
+      var date_to = document.getElementById("dateTo");
+      var list_box = document.getElementById("list_data_selected");
+      var delete_button = document.getElementById("Delete");
+
+      var data_provider_text = document.getElementById("data_provider").innerText.replace(/'/g, '"');
+      var graphs_text = document.getElementById("graphs").innerText.replace(/'/g, '"');
+      var value_axis_title = document.getElementById("value_axis_title").innerText ;
+
+      var data_provider_json = JSON.parse(data_provider_text);
+      var graphs_json = JSON.parse(graphs_text);
+
+      // We initialize the max date of the form with the current date
+      date_from.setAttribute("max", get_current_date());
+      date_to.setAttribute("max", get_current_date());
+      date_to.setAttribute("value", get_current_date());
+
+      // With the listener here, if the value of model's list change, we generate the list "ID" and "Data"
+      model_list.addEventListener('change', function() {
+        generate_id_list(model_list.options[model_list.selectedIndex].innerHTML);
+      });
+
+      // This listener just enabled the delete button if an item is selectionned in the list box.
+      list_box.addEventListener('change', function() {
+        if(typeof list_box.options[list_box.selectedIndex].text !== undefined){
+          delete_button.disabled = false ;
+        }
+      });
+
+      if(getCookie("Model")!="None"){
+        model_list.value=getCookie("Model");
+        init_id_list();
+        init_data_list();
+      }
+
+      if(getCookie("list_number")!="None"){
+        list_box.innerHTML = ""
+        list_number = parseInt(getCookie("list_number"));
+
+        var i = 0 ;
+        while(i < list_number){
+          str_actual_list = "list_" + parseInt(i);
+          actual_in_list = getCookie(str_actual_list);
+          list_box.innerHTML += "<option value=" + actual_in_list + ">" + actual_in_list + "</option>" ;
+          i++ ;
+        }
+      }
+
+      /**
+
+        Functions.
+
+      **/
+
+      // Function for initialize the id's list.
+      function init_id_list(){
+        id_list.innerHTML = ""
+        var i = 0 ;
+        id_number = parseInt(getCookie("id_number"));
+        if(id_number!=0){
+          while (i < id_number) {
+            str_actual_id = "id_" + parseInt(i);
+            actual_id = getCookie(str_actual_id);
+            id_list.innerHTML += "<option value=" + actual_id + ">" + actual_id + "</option>" ;
+            i++;
+          }
+        }
+      }
+
+      // Function for initialize the data's list.
+      function init_data_list(){
+        data_list.innerHTML = "";
+        var i = 0 ;
+        data_number = parseInt(getCookie("data_number"));
+        if(data_number!=0){
+          while (i < data_number) {
+            str_actual_data = "data_" + parseInt(i);
+            actual_data = getCookie(str_actual_data);
+            data_list.innerHTML += "<option value=" + actual_data + ">" + actual_data + "</option>" ;
+            i++;
+          }
+        }
+      }
+
+      // Function to get a cookie.
+      function getCookie(cname) {
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for(var i = 0; i <ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length,c.length);
+            }
+        }
+        return "";
+      }
+
+      // Function that generate id and data list
+      function generate_id_list(model){
+        if(model=="Adeunis"){
+          form.submit();
+        }
+        else if (model=="Watteco") {
+          form.submit();
+        }
+        else{
+          alert("Nothing selectionned");
+        }
+      }
+
+      // Function to get the current date to the format YYYY-MM-DDTHH:mm:SS
+      function get_current_date(){
+        var today = new Date();
+        var year = parseInt(today.getFullYear());
+        var month = parseInt(today.getMonth()+1) ;
+        var day = parseInt(today.getDate());
+        var hour = parseInt(today.getHours());
+        var minute = parseInt(today.getMinutes());
+        var second = parseInt(today.getSeconds());
+
+        if(month < 10){
+          month = "0" + month ;
+        }
+
+        if(day < 10){
+          day = "0" + day ;
+        }
+
+        if(hour < 10){
+          hour = "0" + hour ;
+        }
+
+        if(minute < 10){
+          minute = "0" + minute ;
+        }
+
+        if(second < 10){
+          second = "0" + second ;
+        }
+
+        var date = date + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second ;
+
+        return date ;
+      }
+
+      // Graphe
+      var json_graph = {
+        "type": "serial",
+        "theme": "light",
+        "legend": {
+            "useGraphSettings": true
+        },
+        "dataProvider": data_provider_json,
+        "valueAxes": [{
+            "integersOnly": true,
+            "maximum": 100,
+            "minimum": 1,
+            "reversed": false,
+            "axisAlpha": 0,
+            "dashLength": 5,
+            "gridCount": 10,
+            "position": "left",
+            "title": value_axis_title
+        }],
+        "startDuration": 0.5,
+        "graphs": graphs_json,
+        "chartCursor": {
+            "cursorAlpha": 0,
+            "zoomable": false
+        },
+        "categoryField": "date",
+        "categoryAxis": {
+            //"parseDates":true,
+            //"minPeriod":"ss",
+            "dashLength": 1,
+            "minorGridEnabled": true,
+            "dateFormats": [
+              {
+                "period": "fff",
+                "format": "YYYY-MM-DD JJ:NN:SS"
+              },
+              {
+                "period": "ss",
+                "format": "YYYY-MM-DD JJ:NN:SS"
+              },
+              {
+                "period": "mm",
+                "format": "YYYY-MM-DD JJ:NN:SS"
+              },
+              {
+                "period": "hh",
+                "format": "YYYY-MM-DD JJ:NN:SS"
+              },
+              {
+                "period": "DD",
+                "format": "YYYY-MM-DD JJ:NN:SS"
+              },
+              {
+                "period": "WW",
+                "format": "YYYY-MM-DD JJ:NN:SS"
+              },
+              {
+                "period": "MM",
+                "format": "YYYY-MM-DD JJ:NN:SS"
+              },
+              {
+                "period": "YYYY",
+                "format": "YYYY-MM-DD JJ:NN:SS"
+              }
+            ],
+            "title":"Date",
+            "gridPosition": "start",
+            "axisAlpha": 0,
+            "fillAlpha": 0.05,
+            "fillColor": "#000000",
+            "gridAlpha": 0,
+            "position": "bottom"
+        },
+        "mouseWheelZoomEnabled": true,
+        "chartScrollbar": {
+          "autoGridCount": true,
+          "scrollbarHeight": 20
+        },
+        "export": {
+          "enabled": true,
+          "position": "top-left"
+         }
+      };
+
+      var chart = AmCharts.makeChart("chartdiv", json_graph);
+
+    </script>
+  </body>
+</HTML>

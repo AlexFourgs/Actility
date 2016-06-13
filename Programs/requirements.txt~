@@ -1,0 +1,6 @@
+#
+###### requirements file for pip tool ######
+#
+###### requirements for AS ######
+bottle
+lxml

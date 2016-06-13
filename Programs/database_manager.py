@@ -112,6 +112,29 @@ class DatabaseEngine:
         else:
             return False
 
+    def get_id_model(self, model):
+        """Method for get all id registered in the database for the model specified"""
+        list_id = []
+        request = "SELECT Id FROM Device WHERE Model = \'%s\'"%(model)
+
+        select = self.db.cursor()
+        select.execute(request)
+        ids = select.fetchall()
+
+        for actual in ids:
+            list_id.append(actual[0])
+
+        return list_id
+
+    def data_for_graph(self, model, device_id, data, date_from, date_to):
+        """Methods that executes a SELECT request and returns the results formated in JSON"""
+        request_data = "SELECT " + data +", Date, DeviceId FROM "+model+" WHERE DeviceId=\""+device_id+"\" AND Date >= \""+ date_from +"\" AND Date <= \""+date_to+"\" ORDER BY Date"
+        select = self.db.cursor()
+        select.execute(request_data)
+        all_data = select.fetchall()
+
+        return all_data # With [2]=ID model [1]=Date [0]=Value
+
     def get_columns(self, table):
         """Methods that return all columns name from the table"""
         columns = []
@@ -122,6 +145,26 @@ class DatabaseEngine:
         columns.pop() # Remove the last element of the list which is the primary key column name
         return columns
 
+    def get_columns_data(self, table):
+        columns = self.get_columns(table)
+        columns.pop() # Delete column device_id
+        columns.pop() # Delete column Date
+
+        return columns
+
+    def get_device_model(self, device_id):
+        """Methods that returns the model of the device by comparing ID"""
+        request = "SELECT Model FROM Device WHERE Id = \'%s\'"%(device_id)
+        print(request)
+
+        select = self.db.cursor()
+        select.execute(request)
+        model = select.fetchone()
+
+        if model==None: # Device isn't in the database
+            return False
+        else :
+            return model[0]
 
 #    def delete_table(self):
 #        # TODO
@@ -142,6 +185,24 @@ if __name__ == '__main__' :
     print("DATABASE MANAGER")
 
     database_engine = DatabaseEngine()
-    database_engine.create_table("Device", ["Id CHAR(50) PRIMARY KEY","Model CHAR(50) NOT NULL"])
-    database_engine.insert("Device", ["Id", "Model"], ["0018B20000000167", "Adeunis"])
+    #database_engine.create_table("Device", ["Id CHAR(50) PRIMARY KEY","Model CHAR(50) NOT NULL"])
+    #database_engine.insert("Device", ["Id", "Model"], ["0018B20000000167", "Adeunis"])
+
+    model = database_engine.get_device_model("0028B20000000167")
+    print(model)
+
+    database_engine.get_id_model("Adeunis")
+    database_engine.get_id_model("Watteco")
+
+
+    columns = database_engine.get_columns_data("Adeunis")
+    for column in columns:
+        print column
+
+    columns = database_engine.get_columns_data("Watteco")
+    for column in columns:
+        print column
+
+    database_engine.data_jsons("Adeunis", "0018B20000000167", "Temperature", "2016-05-24 11:41:48", "2016-05-26 14:42:17")
+
     database_engine.close_connection()

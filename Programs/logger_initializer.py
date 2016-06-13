@@ -18,4 +18,4 @@ def init_log(logger_name, log_file):
     logger.addHandler(handler)
 
     for bis_handler in logger.handlers:
-        print bis_handler
+        print(bis_handler)
