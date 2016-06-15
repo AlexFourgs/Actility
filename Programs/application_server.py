@@ -23,7 +23,6 @@ def start_server(ip_adress, on_port, reloader):
 def reset_cookies():
     """
         This function delete all cookies.
-        ### BUGGED ###
     """
     response.set_cookie("Model", "None", path="/")
     response.set_cookie("Add_button", "true", path="/")
@@ -122,7 +121,6 @@ def init_data_provider(list_value):
 
     response.set_cookie("newDataProvider", "1")
 
-    #TODO: order list
     data_provider_list = sorted(data_provider_list, key=lambda k:k['date'])
     return str(data_provider_list)
 
@@ -243,6 +241,7 @@ def update_values():
             actual_data = "%s %s - %s - %s - %s - %s"%(model, id_model, data, dateFrom, dateTo, bool_update)
 
 
+
 def submit_del():
     """
         This function deletes data from dataProvider and graphs if necessary.
@@ -261,7 +260,7 @@ def submit_del():
     data = splitted_data[1]
     date_from = splitted_data[2]
     date_to = splitted_data[3]
-
+    update = splitted_data[4]
 
     # Remove it from the list
     list_added.remove(data_selected)
