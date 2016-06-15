@@ -38,3 +38,5 @@ If you choose the third way, the creator of this project isn't responsible of th
 
 After installing every libraries, in a terminal, go into the folder Actility/Programs and enter "python application_server.py".
 Your server will start.
+
+On local network you can access to a web page for see some charts of your data : http://localhost:8080/data 
