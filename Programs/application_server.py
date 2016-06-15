@@ -2,6 +2,7 @@
 # -*-coding:Utf-8 -*
 
 import client_engine, os, time, logging, logger_initializer, sys
+from datetime import datetime
 from logging import handlers
 from bottle import route, run, request, response, view, static_file
 from PyQt4 import QtGui
@@ -11,6 +12,9 @@ list_added = []
 data_provider_list = []
 graphs_list = []
 value_axis_title = ""
+list_update = []
+
+#TODO: Add automatic refresh
 
 def start_server(ip_adress, on_port, reloader):
     """Function that starts the server on port 8080"""
@@ -22,7 +26,15 @@ def reset_cookies():
         ### BUGGED ###
     """
     response.set_cookie("Model", "None", path="/")
+    response.set_cookie("Add_button", "true", path="/")
+    response.set_cookie("data_list", "", expires=0)
+    response.set_cookie("date_from", "", expires=0)
+    response.set_cookie("date_to", "", expires=0)
+    response.set_cookie("newDataProvider", "", expires=0)
+    response.set_cookie("newGraphs", "", expires=0)
+
     id_number = request.get_cookie("id_number")
+
 
     if id_number:
         id_number = int(id_number)
@@ -33,6 +45,8 @@ def reset_cookies():
             i+=1
 
         response.set_cookie("id_number", "", expires=0)
+
+
 
     reset_data_cookies()
     #reset_list_cookies()
@@ -108,7 +122,10 @@ def init_data_provider(list_value):
 
     response.set_cookie("newDataProvider", "1")
 
+    #TODO: order list
+    data_provider_list = sorted(data_provider_list, key=lambda k:k['date'])
     return str(data_provider_list)
+
 
 def init_graphs(list_value):
     """
@@ -140,7 +157,7 @@ def init_graphs(list_value):
         i+=1
 
     if(i == len(graphs_list)): # If we didn't find a dictionary in graphs with the same ID
-        new_graph = {"balloonText": "Value data of [[category]]: [[value]]", "bullet": "round", "fillAlphas": 0} # We create it
+        new_graph = {"balloonText": "Value data of [[category]]: [[value]]", "bullet": "round", "fillAlphas": 0, "hideBulletsCount": 20} # We create it
         new_graph["valueField"] = str(id_model)
         new_graph["title"] = str(model) + " " + str(id_model)
         graphs_list.append(new_graph)
@@ -161,16 +178,31 @@ def submit_add():
     global data_provider
     global graphs_list
     global value_axis_title
+    global list_update
 
     # Get data from post request
     dateFrom = request.forms.get("dateFrom").replace('T', ' ')
-    dateTo = request.forms.get("dateTo").replace('T', ' ') # Is empty if no value added
     model = request.forms.get("model")
     id_model = request.forms.get("ID")
     data = request.forms.get("Data")
+    update = request.forms.get("update")
+    bool_update = "no"
+
+    if(update != "on"): # If the user doesn't want automatic update of value
+        dateTo = request.forms.get("dateTo").replace('T', ' ') # dateTo = Value set by the user
+    else:
+        bool_update = "yes"
+        # dateTo = actual date
+        date = time.localtime()
+        dateTo = str(date.tm_year) + "-" + str(date.tm_mon) + "-" + str(date.tm_mday) + " " + str(date.tm_hour) + ":" + str(date.tm_min) + ":" + str(date.tm_sec)
+
+        # We save the informations about the charts that we have to updates
+        new_value = {"Model":model, "ID":id_model, "data":data, "last_date":dateTo}
+        list_update.append(new_value)
+
 
     # Set cookies
-    list_added.append("%s %s - %s - %s - %s"%(model, id_model, data, dateFrom, dateTo))
+    list_added.append("%s %s - %s - %s - %s - %s"%(model, id_model, data, dateFrom, dateTo, bool_update))
     response.set_cookie("list_number", str(len(list_added)))
 
     i=0
@@ -189,6 +221,27 @@ def submit_add():
 
     # Changing the title of axis
     value_axis_title = str(data)
+
+def update_values():
+    global list_added
+    global list_update
+
+    date = time.localtime()
+    dateTo = str(date.tm_year) + "-" + str(date.tm_mon) + "-" + str(date.tm_mday) + " " + str(date.tm_hour) + ":" + str(date.tm_min) + ":" + str(date.tm_sec)
+
+    for actual_data in list_added:
+        bool_update = actual_data.split(" - ")[4]
+        last_date = actual_data.split(" - ")[3]
+        model = actual_data.split(" - ")[0].split(" ")[0]
+        id_model = actual_data.split(" - ")[0].split(" ")[1]
+        data = actual_data.split(" - ")[1]
+        dateFrom = actual_data.split(" - ")[2]
+
+        if(bool_update == "yes"):
+            list_value = engine.get_data_for_graph(model, id_model, data, last_date, dateTo) # Get the results list from the database request
+            data_provider = init_data_provider(list_value) # Formalize the list_value in JSON for amGraphs
+            actual_data = "%s %s - %s - %s - %s - %s"%(model, id_model, data, dateFrom, dateTo, bool_update)
+
 
 def submit_del():
     """
@@ -262,9 +315,10 @@ def submit_model():
     """
     global maximum_data_cookies
 
-    # Set the cookie for the model selectionned
+    # Set the cookie for the model selectionned and "Add" button
     model = request.forms.get("model")
     response.set_cookie("Model", str(model), path="/")
+    response.set_cookie("Add_button", "false", path="/")
 
     # Set the cookies for the list of id
     list_id = engine.get_id_from_model(model)

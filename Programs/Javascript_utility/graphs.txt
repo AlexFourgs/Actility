@@ -1,1 +1,1 @@
-[{'title': 'Adeunis 0018B20000000167', 'balloonText': 'Value data of [[category]]: [[value]]', 'fillAlphas': 0, 'bullet': 'round', 'valueField': '0018B20000000167'}]
+[{'hideBulletsCount': 20, 'bullet': 'round', 'title': 'Adeunis 0018B20000000167', 'valueField': '0018B20000000167', 'balloonText': 'Value data of [[category]]: [[value]]', 'fillAlphas': 0}, {'hideBulletsCount': 20, 'bullet': 'round', 'title': 'Watteco 70B3D5E75E000239', 'valueField': '70B3D5E75E000239', 'balloonText': 'Value data of [[category]]: [[value]]', 'fillAlphas': 0}]
