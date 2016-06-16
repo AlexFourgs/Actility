@@ -32,13 +32,13 @@ How to install them
 -------------------
 
 1) With pip tool
-Open a terminal and go into the folder Actility/Documentations.
-Then, enter "pip install -r requirements.txt" and all libraries will be installed.
+    i) Open a terminal and go into the folder Actility/Documentations.
+    ii) Enter "pip install -r requirements.txt" and all libraries will be installed.
 
 
 2) With the script shell
-Open a terminal and go into the folder Actility/Documentations.
-Then, enter "sh install.sh" or "bash install.sh" and all libraries will be installed.
+    i) Open a terminal and go into the folder Actility/Documentations.
+    ii) Enter "sh install.sh" or "bash install.sh" and all libraries will be installed.
 
 
 **If you choose to install the requirements by your own way, the creator of this project isn't responsible of the eventual bug that you will have.**
