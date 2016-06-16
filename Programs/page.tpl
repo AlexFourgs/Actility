@@ -219,17 +219,18 @@
       checkbox.onchange = function(){update_selected()};
 
       /**
-
         initialize every parameters
-
       **/
 
       initialize_value();
 
       /**
+        For refresh data.
+      **/
 
+
+      /**
         Functions.
-
       **/
 
       // This function check the cookies for set the values in the form.
@@ -354,6 +355,11 @@
         else{
           alert("Nothing selectionned");
         }
+      }
+
+      function refresh_data(){
+        document.cookie = "submit_refresh=1" ;
+        form.submit();
       }
 
       // Function to get the current date to the format YYYY-MM-DDTHH:mm:SS

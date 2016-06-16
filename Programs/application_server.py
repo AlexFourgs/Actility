@@ -116,9 +116,6 @@ def init_data_provider(list_value):
             new_date_dictionary[str(actual_data[2])] = actual_data[0]
             data_provider_list.append(new_date_dictionary)
 
-    with open("./Javascript_utility/dataProvider.txt", "w") as file_data_provider:
-        file_data_provider.write(str(data_provider_list))
-
     response.set_cookie("newDataProvider", "1")
 
     data_provider_list = sorted(data_provider_list, key=lambda k:k['date'])
@@ -159,9 +156,6 @@ def init_graphs(list_value):
         new_graph["valueField"] = str(id_model)
         new_graph["title"] = str(model) + " " + str(id_model)
         graphs_list.append(new_graph)
-
-    with open("./Javascript_utility/graphs.txt", "w") as file_graphs:
-        file_graphs.write(str(graphs_list))
 
     response.set_cookie("newGraphs", "1")
 
@@ -391,7 +385,16 @@ def post_set_graph():
     elif(request.forms.get("Add")): # POST from button "Add"
         submit_add()
 
-    else: # POST from JavaScript when changing the model
+    else: # POST from JavaScript
+        refresh = request.get_cookie("submit_refresh")
+        if(refresh == "1"): # Submit for refresh data
+            response.set_cookie("submit_refresh", "0", path="/")
+            update_values()
+        else: # Submit by changing the model
+            submit_model()
+
+
+
         submit_model()
 
     return {"title":"Test", "body":"Je suis le body", "data_provider":data_provider_list, "graphs":graphs_list, "value_axis_title":value_axis_title}
@@ -414,6 +417,7 @@ def listener():
         print("Error, it's not a xml file\nFile rejected.\n")
         logger.warning("Class.Server :: listener :: HTTP POST REQUEST received from %s but body isn't a xml file. Rejected."%(ip))
         return "POST Received but not treat, this server is waiting for an xml file."
+
 
 def window():
     app = QtGui.QApplication(sys.argv)
