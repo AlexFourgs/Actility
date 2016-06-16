@@ -80,7 +80,7 @@ class DatabaseEngine:
                         request = request + str(list_value_data[i]) + ")"
                 i+=1
 
-            print(request)
+            #print(request)
             self.db.execute(request)
             self.db.commit()
 
@@ -155,7 +155,7 @@ class DatabaseEngine:
     def get_device_model(self, device_id):
         """Methods that returns the model of the device by comparing ID"""
         request = "SELECT Model FROM Device WHERE Id = \'%s\'"%(device_id)
-        print(request)
+        #print(request)
 
         select = self.db.cursor()
         select.execute(request)

@@ -357,10 +357,14 @@ def set_graph():
     """
     global data_provider_list
     global graphs_list
+    global list_added
+    global list_update
 
     # We delete all data
     del data_provider_list[:]
     del graphs_list[:]
+    del list_added[:]
+    del list_update[:]
     #cookies = request.cookies()
     #print(cookies.getunicode())
     # We reset / delete all cookies.

@@ -49,4 +49,4 @@ How to use it
 
 In a terminal, go into the folder "**Actility**" of the project and enter "**python Programs/application_server.py**"
 
-Then your server is started, A web page is locally accessible to display the data collected in the form of graphs at this url : <http://localhost:8080/data>
+Then your server is started, a web page is locally accessible to display the data collected in the form of graphs at this url : <http://localhost:8080/data>
