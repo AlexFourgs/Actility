@@ -31,6 +31,9 @@ def reset_cookies():
     response.set_cookie("date_to", "", expires=0)
     response.set_cookie("newDataProvider", "", expires=0)
     response.set_cookie("newGraphs", "", expires=0)
+    response.set_cookie("submit_refresh", "", expires=0)
+    response.set_cookie("auto_refresh", "", expires=0)
+
 
     id_number = request.get_cookie("id_number")
 
