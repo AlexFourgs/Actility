@@ -191,6 +191,8 @@ def submit_add():
         # We save the informations about the charts that we have to updates
         new_value = {"Model":model, "ID":id_model, "data":data, "last_date":dateTo}
         list_update.append(new_value)
+        response.set_cookie("auto_refresh", "1", path="/")
+
 
 
     # Set cookies
@@ -244,6 +246,7 @@ def submit_del():
 
     global list_added
     global data_provider_list
+    global list_update
 
     # Get the data selected in the list from web page and split it
     data_selected = request.forms.get("list_data_selected")
@@ -255,6 +258,16 @@ def submit_del():
     date_from = splitted_data[2]
     date_to = splitted_data[3]
     update = splitted_data[4]
+
+    if(update == "yes"):
+        for actual_dic in list_update:
+            if ((actual_dic["Model"] == model) and (actual_dic["ID"] == id_model) and (actual_dic["data"] == data)):
+                list_update.remove(actual_dic)
+                break
+        if(len(list_update) == 0):
+            response.set_cookie("auto_refresh", "0", path="/")
+
+
 
     # Remove it from the list
     list_added.remove(data_selected)

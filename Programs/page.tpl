@@ -115,7 +115,7 @@
     <form class="center" method="post" action="./data" id="form_graph">
       From : <input type="datetime-local" min="2010-01-01T00:00:00" step=1 value="2010-01-01T00:00:00" name="dateFrom" id="dateFrom"/>
       To : <input type="datetime-local" min="2010-01-01T00:00:00" step=1 name="dateTo" id="dateTo"/>
-      <label for="update">Update : </label><input type="checkbox" name="update" id="update"/>
+      <label for="update">Auto refresh : </label><input type="checkbox" name="update" id="update"/>
       Model : <select name="model" id="model"><option value="None" selected></option><option value="Adeunis">Adeunis</option><option value="Watteco">Watteco</option></select>
       ID : <select name="ID" id="ID"><option value="None" selected>Please select a model</option></select>
       Data : <select name="Data" id="Data"><option value="None" selected>Please select a model</option></select>
@@ -228,7 +228,11 @@
         For refresh data.
       **/
 
-
+      if(getCookie("auto_refresh")!= "None"){
+        if(getCookie("auto_refresh") == 1){
+          setIntervale(refresh_data(), 60000);
+        }
+      }
       /**
         Functions.
       **/
