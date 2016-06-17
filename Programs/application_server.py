@@ -231,6 +231,7 @@ def update_values():
 
         # Refresh data
         list_value = engine.get_data_for_graph(model, id_model, data, last_date, dateTo)
+        print(list_value)
         data_provider = init_data_provider(list_value)
 
         for actual_other_data in list_added:
