@@ -235,6 +235,7 @@ def update_values():
         data_provider = init_data_provider(list_value)
 
         for actual_other_data in list_added:
+            print(actual_other_data)
             actual_bool_update = actual_other_data.split(" - ")[4]
             actual_last_date = actual_other_data.split(" - ")[3]
             actual_model = actual_other_data.split(" - ")[0].split(" ")[0]
