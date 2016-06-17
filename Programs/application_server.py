@@ -240,11 +240,11 @@ def update_values():
             actual_last_date = actual_other_data.split(" - ")[3]
             actual_model = actual_other_data.split(" - ")[0].split(" ")[0]
             actual_id_model = actual_other_data.split(" - ")[0].split(" ")[1]
-            actual_other_data = actual_other_data.split(" - ")[1]
+            actual_other_data_in_list = actual_other_data.split(" - ")[1]
             actual_dateFrom = actual_other_data.split(" - ")[2]
 
-            if((actual_bool_update == "yes") and (actual_last_date == last_date) and (actual_model == model) and (actual_id_model == id_model) and (actual_other_data == data)):
-                actual_other_data = "%s %s - %s - %s - %s - %s"%(actual_model, actual_id_model, actual_other_data, actual_dateFrom, dateTo, actual_bool_update)
+            if((actual_bool_update == "yes") and (actual_last_date == last_date) and (actual_model == model) and (actual_id_model == id_model) and (actual_other_data_in_list == data)):
+                actual_other_data = "%s %s - %s - %s - %s - %s"%(actual_model, actual_id_model, actual_other_data_in_list, actual_dateFrom, dateTo, actual_bool_update)
 
         actual_data["last_date"] = dateTo
 
