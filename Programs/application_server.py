@@ -225,6 +225,7 @@ def update_values():
     dateTo = str(date.tm_year) + "-" + str(date.tm_mon) + "-" + str(date.tm_mday) + " " + str(date.tm_hour) + ":" + str(date.tm_min) + ":" + str(date.tm_sec)
 
     for actual_data in list_update:
+        print(actual_data)
         model = actual_data["Model"]
         id_model = actual_data["ID"]
         data = actual_data["data"]
