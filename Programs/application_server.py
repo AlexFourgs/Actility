@@ -168,7 +168,6 @@ def submit_add():
     """
 
     global list_added
-    global data_provider
     global graphs_list
     global value_axis_title
     global list_update
@@ -209,7 +208,7 @@ def submit_add():
 
     # Creating data JSON for Javascript
     list_value = engine.get_data_for_graph(model, id_model, data, dateFrom, dateTo) # Get the results list from the database request
-    data_provider = init_data_provider(list_value) # Formalize the list_value in JSON for amGraphs
+    init_data_provider(list_value) # Formalize the list_value in JSON for amGraphs
 
     list_value_graph = [model, id_model] # Create a list with the id and the model
     init_graphs(list_value_graph) # Formalize the list_value_graph ub JSON for amGraphs
@@ -235,7 +234,6 @@ def update_values():
         data_provider = init_data_provider(list_value)
 
         for actual_other_data in list_added:
-            print(actual_other_data)
             actual_bool_update = actual_other_data.split(" - ")[4]
             actual_last_date = actual_other_data.split(" - ")[3]
             actual_model = actual_other_data.split(" - ")[0].split(" ")[0]
@@ -421,10 +419,6 @@ def post_set_graph():
 
         else: # Submit by changing the model
             submit_model()
-
-
-
-        submit_model()
 
     return {"title":"Test", "body":"Je suis le body", "data_provider":data_provider_list, "graphs":graphs_list, "value_axis_title":value_axis_title}
 
