@@ -228,14 +228,14 @@ def update_values():
         last_date = actual_data.split(" - ")[3]
         model = actual_data.split(" - ")[0].split(" ")[0]
         id_model = actual_data.split(" - ")[0].split(" ")[1]
-        data_in_list = actual_data.split(" - ")[1]
+        data = actual_data.split(" - ")[1]
         dateFrom = actual_data.split(" - ")[2]
 
         if(bool_update == "yes"):
             list_value = engine.get_data_for_graph(model, id_model, data, dateFrom, dateTo)
             data_provider = init_data_provider(list_value)
             #(actual_last_date == last_date) and (actual_model == model) and (actual_id_model == id_model) and (actual_other_data_in_list == data)):
-            actual_data = "%s %s - %s - %s - %s - %s"%(model, id_model, data_in_list, dateFrom, dateTo, bool_update)
+            actual_data = "%s %s - %s - %s - %s - %s"%(model, id_model, data, dateFrom, dateTo, bool_update)
 
 
 def submit_del():
