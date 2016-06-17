@@ -264,7 +264,7 @@ class Engine:
 
             return list_recorded_data
 
-        elif length_data == 28 : # Temperature + GPS
+        elif ((length_data == 28) or (length_data == 32)) : # Temperature + GPS
             temp = int(data[2:4], 16)
             latitude_degrees = data[4:6]
             latitude_minutes = data[6:11]
