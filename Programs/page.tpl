@@ -230,7 +230,7 @@
 
       if(getCookie("auto_refresh")!= "None"){
         if(getCookie("auto_refresh") == 1){
-          setInterval(refresh_data(), 60000);
+          //setInterval(refresh_data(), 60000);
         }
       }
       /**
