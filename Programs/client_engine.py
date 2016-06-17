@@ -294,7 +294,8 @@ class Engine:
 
         else :
             #self.logger.info("Class.Engine :: adeunis_decoder :: Payload lenght isn't correct")
-            print("info adeunis decoder")
+
+            print("info adeunis decoder : \nlenght_data: %s"%(lenght_data))
 
     def new_device(self, name, device_id):
         """ This method creates and add a new sensor object to the database Sensors object """
