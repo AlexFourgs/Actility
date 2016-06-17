@@ -233,7 +233,7 @@
           setTimeout(function(){
             document.cookie = "submit_refresh=1" ;
             form.submit();
-          }, 6000);
+          }, 60000);
         }
       }
 
