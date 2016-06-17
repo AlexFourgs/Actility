@@ -225,15 +225,6 @@
       initialize_value();
 
       /**
-        For refresh data.
-      **/
-
-      if(getCookie("auto_refresh")!= "None"){
-        if(getCookie("auto_refresh") == 1){
-          setTimeout(refresh_data(), 60000);
-        }
-      }
-      /**
         Functions.
       **/
 
@@ -525,6 +516,12 @@
       var chart = AmCharts.makeChart("chartdiv", json_graph);
       window.map = AmCharts.makeChart("mapdiv", json_map);
 
+      if(getCookie("auto_refresh")!= "None"){
+        if(getCookie("auto_refresh") == 1){
+          setTimeout(refresh_data(), 60000);
+        }
+      }
+      
     </script>
   </body>
 </HTML>
