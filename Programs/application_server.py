@@ -246,7 +246,7 @@ def update_values():
             if((actual_bool_update == "yes") and (actual_last_date == last_date) and (actual_model == model) and (actual_id_model == id_model) and (actual_data == data)):
                 actual_other_data = "%s %s - %s - %s - %s - %s"%(actual_model, actual_id_model, actual_data, actual_dateFrom, dateTo, actual_bool_update)
 
-
+        del actual_data["last_date"]
         actual_data["last_date"] = dateTo
 
 
