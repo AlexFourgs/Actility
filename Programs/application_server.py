@@ -229,6 +229,9 @@ def update_values():
         data = actual_data["data"]
         last_date = actual_data["last_date"]
 
+        print("Last date : %s"%(last_date))
+        print("dateTo: %s"%(dateTo))
+        
         # Refresh data
         list_value = engine.get_data_for_graph(model, id_model, data, last_date, dateTo)
         print(list_value)
