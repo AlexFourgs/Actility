@@ -225,7 +225,6 @@ def update_values():
     dateTo = str(date.tm_year) + "-" + str(date.tm_mon) + "-" + str(date.tm_mday) + " " + str(date.tm_hour) + ":" + str(date.tm_min) + ":" + str(date.tm_sec)
 
     for actual_data in list_update:
-        print(actual_data)
         model = actual_data["Model"]
         id_model = actual_data["ID"]
         data = actual_data["data"]
@@ -240,13 +239,12 @@ def update_values():
             actual_last_date = actual_other_data.split(" - ")[3]
             actual_model = actual_other_data.split(" - ")[0].split(" ")[0]
             actual_id_model = actual_other_data.split(" - ")[0].split(" ")[1]
-            actual_data = actual_other_data.split(" - ")[1]
+            actual_other_data = actual_other_data.split(" - ")[1]
             actual_dateFrom = actual_other_data.split(" - ")[2]
 
-            if((actual_bool_update == "yes") and (actual_last_date == last_date) and (actual_model == model) and (actual_id_model == id_model) and (actual_data == data)):
-                actual_other_data = "%s %s - %s - %s - %s - %s"%(actual_model, actual_id_model, actual_data, actual_dateFrom, dateTo, actual_bool_update)
+            if((actual_bool_update == "yes") and (actual_last_date == last_date) and (actual_model == model) and (actual_id_model == id_model) and (actual_other_data == data)):
+                actual_other_data = "%s %s - %s - %s - %s - %s"%(actual_model, actual_id_model, actual_other_data, actual_dateFrom, dateTo, actual_bool_update)
 
-        del actual_data["last_date"]
         actual_data["last_date"] = dateTo
 
 
