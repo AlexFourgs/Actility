@@ -223,33 +223,20 @@ def update_values():
     date = time.localtime()
     dateTo = str(date.tm_year) + "-" + str(date.tm_mon) + "-" + str(date.tm_mday) + " " + str(date.tm_hour) + ":" + str(date.tm_min) + ":" + str(date.tm_sec)
 
-    for actual_data in list_update:
-        model = actual_data["Model"]
-        id_model = actual_data["ID"]
-        data = actual_data["data"]
-        last_date = actual_data["last_date"]
+    for actual_data in list_added:
+        bool_update = actual_data.split(" - ")[4]
+        last_date = actual_data.split(" - ")[3]
+        model = actual_data.split(" - ")[0].split(" ")[0]
+        id_model = actual_data.split(" - ")[0].split(" ")[1]
+        data_in_list = actual_data.split(" - ")[1]
+        dateFrom = actual_data.split(" - ")[2]
 
-        print("Last date : %s"%(last_date))
-        print("dateTo: %s"%(dateTo))
-        
-        # Refresh data
-        list_value = engine.get_data_for_graph(model, id_model, data, last_date, dateTo)
-        print(list_value)
-        data_provider = init_data_provider(list_value)
-
-        for actual_other_data in list_added:
-            actual_bool_update = actual_other_data.split(" - ")[4]
-            actual_last_date = actual_other_data.split(" - ")[3]
-            actual_model = actual_other_data.split(" - ")[0].split(" ")[0]
-            actual_id_model = actual_other_data.split(" - ")[0].split(" ")[1]
-            actual_other_data_in_list = actual_other_data.split(" - ")[1]
-            actual_dateFrom = actual_other_data.split(" - ")[2]
-
-            if((actual_bool_update == "yes") and (actual_last_date == last_date) and (actual_model == model) and (actual_id_model == id_model) and (actual_other_data_in_list == data)):
-                actual_other_data = "%s %s - %s - %s - %s - %s"%(actual_model, actual_id_model, actual_other_data_in_list, actual_dateFrom, dateTo, actual_bool_update)
-
-        actual_data["last_date"] = dateTo
-
+        if(actual_bool_update == "yes"):
+            list_value = engine.get_data_for_graph(model, id_model, data, dateFrom, dateTo)
+            data_provider = init_data_provider(list_value)
+            #(actual_last_date == last_date) and (actual_model == model) and (actual_id_model == id_model) and (actual_other_data_in_list == data)):
+            actual_other_data = "%s %s - %s - %s - %s - %s"%(actual_model, actual_id_model, actual_other_data_in_list, actual_dateFrom, dateTo, actual_bool_update)
+    
 
 def submit_del():
     """
