@@ -231,12 +231,12 @@ def update_values():
         data_in_list = actual_data.split(" - ")[1]
         dateFrom = actual_data.split(" - ")[2]
 
-        if(actual_bool_update == "yes"):
+        if(bool_update == "yes"):
             list_value = engine.get_data_for_graph(model, id_model, data, dateFrom, dateTo)
             data_provider = init_data_provider(list_value)
             #(actual_last_date == last_date) and (actual_model == model) and (actual_id_model == id_model) and (actual_other_data_in_list == data)):
-            actual_other_data = "%s %s - %s - %s - %s - %s"%(actual_model, actual_id_model, actual_other_data_in_list, actual_dateFrom, dateTo, actual_bool_update)
-    
+            actual_data = "%s %s - %s - %s - %s - %s"%(model, id_model, data_in_list, dateFrom, dateTo, bool_update)
+
 
 def submit_del():
     """
